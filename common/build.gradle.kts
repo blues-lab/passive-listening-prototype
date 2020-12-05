@@ -1,9 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    java
     kotlin("jvm") version "1.4.20"
-    application
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
     id("io.gitlab.arturbosch.detekt").version("1.15.0-RC1")
 }
@@ -13,14 +11,12 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-//    jcenter()
     maven {
         url = uri("https://kotlin.bintray.com/kotlinx")
     }
 }
 
 dependencies {
-    implementation(project(":common"))
 //    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
     implementation("io.grpc:grpc-kotlin-stub:0.2.1")
     implementation("io.grpc:grpc-netty-shaded:1.34.0")
@@ -39,10 +35,6 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "15"
-}
-
-application {
-    mainClass.set("TranscriptionServerKt")
 }
 
 tasks.test {
