@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     id("org.jlleitschuh.gradle.ktlint")
     id("io.gitlab.arturbosch.detekt")
+    id("com.github.ben-manes.versions")
 }
 
 group = "edu.berkeley.cs"
