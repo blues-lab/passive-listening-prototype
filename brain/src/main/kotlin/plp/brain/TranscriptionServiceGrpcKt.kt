@@ -1,3 +1,6 @@
+package plp.brain
+
+import TranscriptionServiceGrpc
 import io.grpc.CallOptions
 import io.grpc.CallOptions.DEFAULT
 import io.grpc.Channel
@@ -21,6 +24,7 @@ import kotlin.jvm.JvmStatic
 /**
  * Holder for Kotlin coroutine-based client and server APIs for TranscriptionService.
  */
+
 object TranscriptionServiceGrpcKt {
     @JvmStatic
     val serviceDescriptor: ServiceDescriptor

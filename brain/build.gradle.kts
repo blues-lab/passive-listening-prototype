@@ -13,5 +13,5 @@ dependencies {
 }
 
 application {
-    mainClass.set("TranscriptionServerKt")
+    mainClass.set("plp.brain.TranscriptionServerKt")
 }
