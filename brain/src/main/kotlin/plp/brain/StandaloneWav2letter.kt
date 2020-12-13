@@ -3,6 +3,7 @@ package plp.brain
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
+import plp.common.configureLogging
 import java.io.File
 
 /**

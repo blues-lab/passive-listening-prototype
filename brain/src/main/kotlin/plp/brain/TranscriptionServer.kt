@@ -4,16 +4,9 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
 import mu.KotlinLogging
+import plp.common.configureLogging
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
-
-fun configureLogging() {
-    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace")
-
-    val path: String = {}.javaClass.getResource("logging.properties").file
-    val loggingConfig = System.getProperty("java.util.logging.config.file", path)
-    System.setProperty("java.util.logging.config.file", loggingConfig)
-}
 
 @ExperimentalPathApi
 fun main(args: Array<String>) {
