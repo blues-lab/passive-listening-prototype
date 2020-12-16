@@ -1,5 +1,8 @@
 package plp.ear
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.produce
 import mu.KotlinLogging
 import plp.common.runCommandAndGetOutput
 import java.nio.file.Path
@@ -56,4 +59,22 @@ fun recordNext(durationSeconds: Int, containingDirectory: Path): Path {
     val path = pathToNextRecording(containingDirectory)
     recordMac(durationSeconds, path)
     return path
+}
+
+data class Recording(val path: Path)
+
+@ExperimentalPathApi
+class Recorder(private val segmentDuration: Int, private val targetDirectory: Path) {
+    fun recordNext(): Recording {
+        val path = recordNext(segmentDuration, targetDirectory)
+        return Recording(path)
+    }
+}
+
+@ExperimentalCoroutinesApi
+@ExperimentalPathApi
+fun CoroutineScope.recordContinuously(recorder: Recorder) = produce {
+    while (true) {
+        send(recorder.recordNext())
+    }
 }
