@@ -26,7 +26,7 @@ fun pathToNextRecording(directory: Path): Path {
 }
 
 fun recordMac(durationSeconds: Int, path: Path) {
-    logger.info("recording %d seconds using ffmpeg to %s", durationSeconds, path)
+    logger.info("recording $durationSeconds seconds using ffmpeg to $path")
 
     runCommandAndGetOutput(
         listOf(
@@ -45,7 +45,7 @@ fun recordMac(durationSeconds: Int, path: Path) {
         )
     )
 
-    logger.debug("recording finished %s", path)
+    logger.debug("recording finished $path")
 }
 
 /**
