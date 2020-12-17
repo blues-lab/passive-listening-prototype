@@ -19,7 +19,7 @@ repositories {
 
 
 dependencies {
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.3")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.4")
     implementation("org.slf4j:slf4j-jdk14:1.7.30")
 
     // JUnit
@@ -40,7 +40,7 @@ tasks.getByPath("detekt").onlyIf { gradle.startParameter.taskNames.contains("det
 
 
 detekt {
-    toolVersion = "1.15.0-RC1"
+    toolVersion = "1.15.0-RC2"
     config = files("${rootDir}/detekt.yml")
     buildUponDefaultConfig = true
 }
