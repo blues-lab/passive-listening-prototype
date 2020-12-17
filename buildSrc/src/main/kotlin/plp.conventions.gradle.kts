@@ -37,3 +37,10 @@ tasks.test {
 }
 
 tasks.getByPath("detekt").onlyIf { gradle.startParameter.taskNames.contains("detekt") }
+
+
+detekt {
+    toolVersion = "1.15.0-RC1"
+    config = files("${rootDir}/detekt.yml")
+    buildUponDefaultConfig = true
+}
