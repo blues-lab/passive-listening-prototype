@@ -12,4 +12,5 @@ dependencies {
     implementation("org.jlleitschuh.gradle:ktlint-gradle:9.4.1")
     implementation("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.15.0-RC2")
     implementation("com.github.ben-manes:gradle-versions-plugin:0.36.0")
+    implementation("gradle.plugin.com.google.protobuf:protobuf-gradle-plugin:0.8.14")
 }

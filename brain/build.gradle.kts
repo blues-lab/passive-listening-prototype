@@ -2,13 +2,11 @@ plugins {
     java
     application
     id("plp.conventions")
+    id("plp.grpc")
 }
 
 dependencies {
     implementation(project(":common"))
-    implementation("io.grpc:grpc-kotlin-stub:1.0.0")
-    implementation("io.grpc:grpc-netty-shaded:1.34.1")
-//    implementation("io.grpc:grpc-protobuf:1.34.0")
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
 }
 
