@@ -6,8 +6,8 @@ import mu.KotlinLogging
 const val DEFAULT_PORT = 50057
 
 private val logger = KotlinLogging.logger {}
-abstract class GrpcServer(
-    val server: Server
+open class GrpcServer(
+    private val server: Server
 ) {
     fun start() {
         logger.debug { "getting ready to start" }
