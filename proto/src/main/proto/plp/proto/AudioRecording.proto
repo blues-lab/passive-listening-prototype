@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package plp.proto;
+
+service AudioRecording {
+  /** Continuously return new recordings */
+  rpc StreamRecordings(RecordingSessionSpecification) returns (stream Recording) {}
+}
+
+message RecordingSessionSpecification {
+  /** How long, in seconds, each recording should be */
+  int32 segmentDuration = 10;
+}
+
+message Recording {
+  /** The bytes of the WAV audio */
+  bytes audio = 10;
+  /** The time at the beginning of this recording, as a Unix timestamp */
+  int32 timestamp = 20;
+}

@@ -39,6 +39,18 @@ tasks.test {
 tasks.getByPath("detekt").onlyIf { gradle.startParameter.taskNames.contains("detekt") }
 
 
+ktlint {
+    filter {
+        exclude("build/**")
+        exclude("**/generated/**")
+        /*
+        From https://github.com/jlleitschuh/ktlint-gradle#faq:
+        Gradle based filtering are only working for files located inside project (subproject) folder, see https://github.com/gradle/gradle/issues/3417 To filter files outside project dir, use:
+         */
+        exclude { element -> element.file.path.contains("generated/") }
+    }
+}
+
 detekt {
     toolVersion = "1.15.0-RC2"
     config = files("${rootDir}/detekt.yml")
