@@ -18,6 +18,7 @@ private val logger = KotlinLogging.logger {}
 class TranscriptionService(private val modelPath: NioFilePath, private val tmpDir: NioFilePath) :
     TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineImplBase() {
     @ExperimentalPathApi
+    @Suppress("TooGenericExceptionCaught")
     override suspend fun transcribeFile(request: Stt.TranscriptionRequest): Stt.TranscriptionResponse {
         logger.info { "handling request ${request.id}" }
 

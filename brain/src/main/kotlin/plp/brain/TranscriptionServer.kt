@@ -23,9 +23,8 @@ fun main(args: Array<String>) {
     val logger = KotlinLogging.logger {}
     logger.info("starting Transcription server")
 
-    val port = 50057
     val service = TranscriptionService(Path(resolveHomeDirectory(model)), Path(resolveHomeDirectory(tmpDir)))
-    val server = MutualTlsGrpcServer(service, port, cert, key, root)
+    val server = MutualTlsGrpcServer(service, DEFAULT_PORT, cert, key, root)
     server.start()
     server.blockUntilShutdown()
 }
