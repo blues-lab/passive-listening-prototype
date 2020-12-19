@@ -1,4 +1,4 @@
-package plp.brain
+package plp.common.rpc
 
 import io.grpc.Server
 import mu.KotlinLogging

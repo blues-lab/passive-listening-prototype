@@ -1,4 +1,4 @@
-package plp.brain
+package plp.common.rpc
 
 import io.grpc.kotlin.AbstractCoroutineServerImpl
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts

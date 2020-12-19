@@ -1,5 +1,6 @@
 plugins {
     id("plp.conventions")
+    id("plp.grpc")
 }
 
 dependencies {
