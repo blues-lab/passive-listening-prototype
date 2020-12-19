@@ -4,14 +4,8 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
 import plp.common.configureLogging
+import plp.common.resolveHomeDirectory
 import java.io.File
-
-/**
- * Replace ~ in given string with user's home directory
- */
-fun resolveHomeDirectory(path: String): String {
-    return path.replaceFirst("~", System.getProperty("user.home"))
-}
 
 fun main(args: Array<String>) {
     configureLogging()

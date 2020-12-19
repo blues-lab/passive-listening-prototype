@@ -5,6 +5,7 @@ import kotlinx.cli.ArgType
 import kotlinx.cli.required
 import mu.KotlinLogging
 import plp.common.configureLogging
+import plp.common.resolveHomeDirectory
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 
