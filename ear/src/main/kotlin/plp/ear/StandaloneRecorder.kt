@@ -17,5 +17,5 @@ fun main(args: Array<String>) {
     parser.parse(args)
 
     val containingDirectory = Path(path)
-    recordNext(duration, containingDirectory)
+    recordNext(DEFAULT_RECORDER, duration, containingDirectory)
 }

@@ -20,9 +20,14 @@ fun main(args: Array<String>) = runBlocking {
     parser.parse(args)
 
     val containingDirectory = Path(path)
-    val recorder = Recorder(duration, containingDirectory)
+    val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, duration, containingDirectory)
     val newRecordings = recordContinuously(recorder)
-    repeat(3) {
+
+    @Suppress("MagicNumber")
+    val count = 3
+
+    repeat(count) {
+        println("recording $it/3")
         val nextRecording = newRecordings.receive()
         println("finished recording $nextRecording")
     }

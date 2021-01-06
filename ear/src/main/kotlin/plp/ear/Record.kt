@@ -5,13 +5,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.flow
 import mu.KotlinLogging
-import plp.common.runCommandAndGetOutput
 import java.nio.file.Path
 import java.time.Instant
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.div
 
 private const val RECORDING_FILE_EXTENSION = ".wav"
+
+val DEFAULT_RECORDER = RecordJava
 
 private val logger = KotlinLogging.logger {}
 
@@ -29,59 +30,44 @@ fun pathToNextRecording(directory: Path): Path {
     return directory / filename
 }
 
-fun recordMac(durationSeconds: Int, path: Path) {
-    logger.info("recording $durationSeconds seconds using ffmpeg to $path")
-
-    runCommandAndGetOutput(
-        listOf(
-            "ffmpeg",
-            "-f",
-            "avfoundation",
-            "-i",
-            ":0",
-            "-t",
-            durationSeconds.toString(),
-            "-ac",
-            "1",
-            "-ar",
-            "16k",
-            path.toString()
-        )
-    )
-
-    logger.debug("recording finished $path")
+fun interface RecordOnce {
+    fun record(durationSeconds: Int, path: Path)
 }
 
 /**
  * @return the path to the newly recorded file
  */
 @ExperimentalPathApi
-fun recordNext(durationSeconds: Int, containingDirectory: Path): Path {
+fun recordNext(recorder: RecordOnce, durationSeconds: Int, containingDirectory: Path): Path {
     val path = pathToNextRecording(containingDirectory)
-    recordMac(durationSeconds, path)
+    recorder.record(durationSeconds, path)
     return path
 }
 
 data class Recording(val path: Path)
 
 @ExperimentalPathApi
-class Recorder(private val segmentDuration: Int, private val targetDirectory: Path) {
+class MultiSegmentRecorder(
+    private val recorder: RecordOnce,
+    private val segmentDuration: Int,
+    private val targetDirectory: Path
+) {
     fun recordNext(): Recording {
-        val path = recordNext(segmentDuration, targetDirectory)
+        val path = recordNext(recorder, segmentDuration, targetDirectory)
         return Recording(path)
     }
 }
 
 @ExperimentalCoroutinesApi
 @ExperimentalPathApi
-fun CoroutineScope.recordContinuously(recorder: Recorder) = produce {
+fun CoroutineScope.recordContinuously(recorder: MultiSegmentRecorder) = produce {
     while (true) {
         send(recorder.recordNext())
     }
 }
 
 @ExperimentalPathApi
-fun recordingFlow(recorder: Recorder) = flow {
+fun recordingFlow(recorder: MultiSegmentRecorder) = flow {
     while (true) {
         emit(recorder.recordNext())
     }

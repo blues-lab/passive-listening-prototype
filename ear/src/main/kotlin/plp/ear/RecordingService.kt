@@ -24,7 +24,7 @@ internal fun serializeRecording(recording: Recording): AudioRecordingOuterClass.
 @ExperimentalPathApi
 class RecordingService(private val tmpDirectory: Path) : AudioRecordingGrpcKt.AudioRecordingCoroutineImplBase() {
     override fun streamRecordings(request: AudioRecordingOuterClass.RecordingSessionSpecification): Flow<AudioRecordingOuterClass.Recording> {
-        val recorder = Recorder(request.segmentDuration, tmpDirectory)
+        val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, request.segmentDuration, tmpDirectory)
         return recordingFlow(recorder).map(::serializeRecording)
     }
 }
