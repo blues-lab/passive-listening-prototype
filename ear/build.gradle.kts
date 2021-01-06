@@ -19,5 +19,5 @@ dependencies {
 }
 
 application {
-    mainClass.set("plp.ear.StandaloneContinuousRecorderKt")
+    mainClass.set("plp.ear.RecordingServerKt")
 }

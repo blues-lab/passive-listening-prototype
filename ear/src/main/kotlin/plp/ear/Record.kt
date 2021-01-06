@@ -3,6 +3,7 @@ package plp.ear
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.flow.flow
 import mu.KotlinLogging
 import plp.common.runCommandAndGetOutput
 import java.nio.file.Path
@@ -76,5 +77,12 @@ class Recorder(private val segmentDuration: Int, private val targetDirectory: Pa
 fun CoroutineScope.recordContinuously(recorder: Recorder) = produce {
     while (true) {
         send(recorder.recordNext())
+    }
+}
+
+@ExperimentalPathApi
+fun recordingFlow(recorder: Recorder) = flow {
+    while (true) {
+        emit(recorder.recordNext())
     }
 }
