@@ -26,6 +26,7 @@ fun main(args: Array<String>) = runBlocking {
     val dataDir by parser.option(ArgType.String).required()
     parser.parse(args)
 
+    // Ascertain locations for data files
     val dataPath = dataDir.toPath()
     val audioPath = dataPath / "audio"
     if (!audioPath.exists()) {
@@ -34,11 +35,16 @@ fun main(args: Array<String>) = runBlocking {
         throw IllegalArgumentException("audio directory exists and isn't a directory: $audioPath")
     }
 
+    // Create database paths and objects
     val dbPath = dataPath / "db.sqlite"
     val dbConnection = "jdbc:sqlite:$dbPath"
     val driver: SqlDriver = JdbcSqliteDriver(dbConnection)
     val database = Database(driver)
 
+    // Make sure database is initialized with schema
+    Database.Schema.create(driver)
+
+    // Begin recording
     val client = MutualAuthRecordingClient(key = key.toPath(), cert = cert.toPath(), root = root.toPath())
     handleRecordings(dataDir.toPath(), database, client.receiveRecordings())
 }
