@@ -1,6 +1,5 @@
-import com.google.protobuf.gradle.protobuf
-
 plugins {
+    id("com.github.johnrengelman.shadow") version "6.1.0"
     java
     application
     id("plp.conventions")
@@ -18,6 +17,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
 }
 
+val main = "plp.ear.RecordingServerKt"
+
 application {
-    mainClass.set("plp.ear.RecordingServerKt")
+    mainClassName = main // needed for shadow plugin
+    mainClass.set(main)
 }
