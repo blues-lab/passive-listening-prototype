@@ -2,15 +2,11 @@ package plp.brain
 
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
-import kotlinx.cli.ArgParser
-import kotlinx.cli.ArgType
-import kotlinx.cli.required
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import plp.common.configureLogging
-import plp.common.toPath
+import plp.data.Database
 import plp.proto.AudioRecordingGrpcKt
 import plp.proto.AudioRecordingOuterClass
 import java.nio.file.Path
@@ -51,27 +47,24 @@ class MutualAuthRecordingClient(private val root: Path, private val cert: Path, 
 }
 
 @ExperimentalPathApi
-fun handleRecordings(tmpPath: Path, recordings: Flow<AudioRecordingOuterClass.Recording>) = runBlocking {
-    recordings.collect { recording: AudioRecordingOuterClass.Recording ->
-        logger.info { "received recording from ${recording.timestamp}" }
-        val filename = "${recording.timestamp}.wav"
-        val filePath = tmpPath / filename
-        filePath.writeBytes(recording.audio.toByteArray())
-        logger.debug { "wrote ${recording.audio.size()} bytes to $filePath" }
+fun handleRecordings(audioDirectory: Path, database: Database, recordings: Flow<AudioRecordingOuterClass.Recording>) =
+    runBlocking {
+        val queries = database.audioQueries
+
+        recordings.collect { recording: AudioRecordingOuterClass.Recording ->
+            logger.info { "received recording from ${recording.timestamp}" }
+
+            // Write audio to file
+            val filename = "${recording.timestamp}.wav"
+            val filePath = audioDirectory / filename
+            filePath.writeBytes(recording.audio.toByteArray())
+            logger.debug { "wrote ${recording.audio.size()} bytes to $filePath" }
+
+            // Save recording to database
+            queries.insert(
+                filename,
+                recording.timestamp.toLong(),
+                RECORDING_SEGMENT_DURATION_SECONDS.toDouble()
+            ) // FIXME: use computed recording duration
+        }
     }
-}
-
-@ExperimentalPathApi
-fun main(args: Array<String>) = runBlocking {
-    configureLogging()
-
-    val parser = ArgParser("RecordingServer")
-    val key by parser.option(ArgType.String).required()
-    val cert by parser.option(ArgType.String).required()
-    val root by parser.option(ArgType.String).required()
-    val tmpDir by parser.option(ArgType.String).required()
-    parser.parse(args)
-
-    val client = MutualAuthRecordingClient(key = key.toPath(), cert = cert.toPath(), root = root.toPath())
-    handleRecordings(tmpDir.toPath(), client.receiveRecordings())
-}
