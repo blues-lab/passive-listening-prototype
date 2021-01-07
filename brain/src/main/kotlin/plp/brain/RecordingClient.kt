@@ -14,6 +14,7 @@ import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.div
 import kotlin.io.path.writeBytes
 
+const val EAR_HOST = "localhost"
 const val DEFAULT_PORT = 50058
 const val RECORDING_SEGMENT_DURATION_SECONDS = 5
 
@@ -33,7 +34,7 @@ class MutualAuthRecordingClient(private val root: Path, private val cert: Path, 
             .trustManager(root.toFile())
             .keyManager(cert.toFile(), key.toFile())
             .build()
-        val channel = NettyChannelBuilder.forAddress("localhost", DEFAULT_PORT).useTransportSecurity()
+        val channel = NettyChannelBuilder.forAddress(EAR_HOST, DEFAULT_PORT).useTransportSecurity()
             .sslContext(sslContext)
             .build()
 
