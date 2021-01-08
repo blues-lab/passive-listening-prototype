@@ -1,7 +1,7 @@
 package plp.brain
 
-import mu.KotlinLogging
 import plp.common.runCommandAndGetOutput
+import plp.logging.KotlinLogging
 import java.io.File
 
 /**

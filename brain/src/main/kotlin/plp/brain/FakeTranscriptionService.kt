@@ -1,6 +1,6 @@
 package plp.brain
 
-import mu.KotlinLogging
+import plp.logging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 

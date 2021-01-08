@@ -6,7 +6,7 @@ import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder
 import io.grpc.netty.shaded.io.netty.handler.ssl.ClientAuth
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContext
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder
-import mu.KotlinLogging
+import plp.logging.KotlinLogging
 import java.io.File
 
 private val logger = KotlinLogging.logger {}

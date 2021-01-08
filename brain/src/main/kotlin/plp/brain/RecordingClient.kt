@@ -3,7 +3,7 @@ package plp.brain
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import kotlinx.coroutines.flow.Flow
-import mu.KotlinLogging
+import plp.logging.KotlinLogging
 import plp.proto.AudioRecordingGrpcKt
 import plp.proto.AudioRecordingOuterClass
 import java.nio.file.Path

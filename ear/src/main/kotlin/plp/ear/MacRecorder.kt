@@ -1,7 +1,7 @@
 package plp.ear
 
-import mu.KotlinLogging
 import plp.common.runCommandAndGetOutput
+import plp.logging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 

@@ -19,9 +19,6 @@ repositories {
 
 
 dependencies {
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.4")
-    implementation("org.slf4j:slf4j-jdk14:1.7.30")
-
     // JUnit
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")

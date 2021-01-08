@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.flow
-import mu.KotlinLogging
+import plp.logging.KotlinLogging
 import java.nio.file.Path
 import java.time.Instant
 import kotlin.io.path.ExperimentalPathApi

@@ -1,6 +1,6 @@
 package plp.brain
 
-import mu.KotlinLogging
+import plp.logging.KotlinLogging
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteExisting

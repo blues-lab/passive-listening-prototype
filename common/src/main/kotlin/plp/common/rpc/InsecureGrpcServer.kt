@@ -2,7 +2,7 @@ package plp.common.rpc
 
 import io.grpc.ServerBuilder
 import io.grpc.kotlin.AbstractCoroutineServerImpl
-import mu.KotlinLogging
+import plp.logging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 

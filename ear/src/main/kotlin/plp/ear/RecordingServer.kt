@@ -3,10 +3,10 @@ package plp.ear
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
-import mu.KotlinLogging
 import plp.common.configureLogging
 import plp.common.resolveHomeDirectory
 import plp.common.rpc.MutualTlsGrpcServer
+import plp.logging.KotlinLogging
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 

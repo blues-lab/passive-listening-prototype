@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     implementation(project(":common"))
+    implementation(project(":logging"))
     api(project(":proto")) // only necessary for IntelliJ to find sources
     protobuf(project(":proto"))
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")

@@ -3,8 +3,8 @@ package plp.brain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
-import mu.KotlinLogging
 import plp.data.Database
+import plp.logging.KotlinLogging
 import plp.proto.AudioRecordingOuterClass
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi

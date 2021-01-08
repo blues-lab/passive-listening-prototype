@@ -1,6 +1,6 @@
 package plp.common
 
-import mu.KotlinLogging
+import plp.logging.KotlinLogging
 import java.util.concurrent.TimeUnit
 
 /**

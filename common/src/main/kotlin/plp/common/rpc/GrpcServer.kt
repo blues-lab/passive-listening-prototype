@@ -1,7 +1,7 @@
 package plp.common.rpc
 
 import io.grpc.Server
-import mu.KotlinLogging
+import plp.logging.KotlinLogging
 
 const val DEFAULT_PORT = 50057
 
