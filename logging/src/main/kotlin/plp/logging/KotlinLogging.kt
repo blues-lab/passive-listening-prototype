@@ -28,6 +28,27 @@ private fun getCurrentTime(): String {
 }
 
 /**
+ * ANSI color codes
+ * via https://stackoverflow.com/q/5762491
+ */
+@Suppress("MagicNumber")
+enum class Color(val ansiCode: Int) {
+    RESET(0),
+    BLACK(30),    // BLACK
+    RED(31),      // RED
+    GREEN(32),    // GREEN
+    YELLOW(33),   // YELLOW
+    BLUE(34),     // BLUE
+    MAGENTA(35),  // MAGENTA
+    CYAN(36),     // CYAN
+    WHITE(37);    // WHITE
+
+    override fun toString(): String {
+        return "\u001B[${this.ansiCode}m"
+    }
+}
+
+/**
  * This module attempts to implement a standalone logger
  * that is *somewhat* API-compatible with KotlinLogging API of the kotlin-logging library:
  * https://github.com/MicroUtils/kotlin-logging/blob/master/LICENSE
@@ -43,6 +64,18 @@ object KotlinLogging {
 }
 
 enum class LogLevel { DEBUG, INFO, WARNING, ERROR }
+
+/**
+ * Return the appropriate color for the given log level
+ */
+fun colorForLevel(level: LogLevel): Color {
+    return when (level) {
+        LogLevel.DEBUG -> Color.CYAN
+        LogLevel.INFO -> Color.GREEN
+        LogLevel.WARNING -> Color.YELLOW
+        LogLevel.ERROR -> Color.RED
+    }
+}
 
 class Logger(private val name: String) {
     fun debug(msg: String?) {
@@ -79,7 +112,8 @@ class Logger(private val name: String) {
 
     private fun log(level: LogLevel, msg: () -> Any?) {
         val messageString = msg.invoke().toString()
-        val statement = "${getCurrentTime()} - $name - $level - $messageString"
+        val color = colorForLevel(level)
+        val statement = "$color${getCurrentTime()} - $name - $level - $messageString${Color.RESET}"
         System.err.println(statement)
     }
 }
