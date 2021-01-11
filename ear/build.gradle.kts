@@ -18,9 +18,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
 }
 
-val main = "plp.ear.RecordingServerKt"
+val main = "plp.ear.MainKt"
 
 application {
     mainClassName = main // needed for shadow plugin
     mainClass.set(main)
+}
+
+val run by tasks.getting(JavaExec::class) {
+    standardInput = System.`in`
 }

@@ -61,6 +61,8 @@ class MultiSegmentRecorder(
 @ExperimentalCoroutinesApi
 @ExperimentalPathApi
 fun CoroutineScope.recordContinuously(recorder: MultiSegmentRecorder) = produce {
+    logger.debug("recording continuously")
+
     while (true) {
         send(recorder.recordNext())
     }
