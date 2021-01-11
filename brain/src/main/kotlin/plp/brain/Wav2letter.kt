@@ -3,6 +3,7 @@ package plp.brain
 import plp.common.runCommandAndGetOutput
 import plp.logging.KotlinLogging
 import java.io.File
+import java.nio.file.Path
 
 /**
  * Transcribe audio using wav2letter
@@ -65,4 +66,10 @@ fun transcribeFile(fileToTranscribe: File, modelDir: File): String {
     val transcript = extractTextFromWav2letterOutput(output)
     logger.debug { "transcribed $filename as $transcript" }
     return transcript
+}
+
+class Wav2letterTranscriber(private val modelDir: Path) : Transcriber {
+    override fun transcribeFile(file: Path): String {
+        return transcribeFile(file.toFile(), modelDir.toFile())
+    }
 }
