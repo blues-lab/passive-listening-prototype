@@ -1,7 +1,7 @@
 import com.google.protobuf.gradle.protobuf
 
 plugins {
-    java
+    // java
     application
     id("plp.conventions")
     id("plp.grpc")
@@ -22,7 +22,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("plp.brain.RecordingClientMainKt")
+    mainClass.set("plp.brain.TranscriptionServiceMainKt")
 }
 
 sqldelight {
