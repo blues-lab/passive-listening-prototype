@@ -102,7 +102,7 @@ fun launchRecordingPipeline(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo)
     val transcriber = MutualAuthTranscriptionClient(mutualAuthInfo)
 
     logger.debug { "launching recording job" }
-    return GlobalScope.launch {
+    val recordingJob = GlobalScope.launch {
         val newRecordings = recordContinuously(recorder)
         val registeredRecordings = registerRecordings(database, newRecordings)
         val transcribedRecordings = transcribeRecordings(database, transcriber, registeredRecordings)
@@ -114,6 +114,8 @@ fun launchRecordingPipeline(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo)
             i++
         }
     }
+    logger.debug { "recording job is now running in the background" }
+    return recordingJob
 }
 
 @ExperimentalCoroutinesApi
