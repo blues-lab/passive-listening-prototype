@@ -10,7 +10,7 @@ import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 
 const val EAR_HOST = "localhost"
-const val DEFAULT_PORT = 50058
+private const val DEFAULT_PORT = 50058
 const val RECORDING_SEGMENT_DURATION_SECONDS = 5
 
 private val logger = KotlinLogging.logger {}
