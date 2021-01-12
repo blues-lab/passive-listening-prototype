@@ -10,6 +10,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import plp.common.rpc.MutualAuthInfo
 import plp.data.Database
 import plp.logging.KotlinLogging
@@ -96,14 +97,14 @@ fun CoroutineScope.transcribeRecordings(
 
 @ExperimentalCoroutinesApi
 @ExperimentalPathApi
-fun launchRecordingPipeline(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo): Job {
+fun launchRecordingPipeline(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo, state: RecordingState): Job {
     val database = initDatabase(dataDirectory)
     val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, DEFAULT_DURATION_SECONDS, dataDirectory)
     val transcriber = MutualAuthTranscriptionClient(mutualAuthInfo)
 
     logger.debug { "launching recording job" }
     val recordingJob = GlobalScope.launch {
-        val newRecordings = recordContinuously(recorder)
+        val newRecordings = recordContinuously(recorder, state)
         val registeredRecordings = registerRecordings(database, newRecordings)
         val transcribedRecordings = transcribeRecordings(database, transcriber, registeredRecordings)
 
@@ -120,8 +121,9 @@ fun launchRecordingPipeline(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo)
 
 @ExperimentalCoroutinesApi
 @ExperimentalPathApi
-fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) {
-    val recordingJob = launchRecordingPipeline(dataDirectory, mutualAuthInfo)
+fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) = runBlocking {
+    val state = RecordingState
+    val recordingJob = launchRecordingPipeline(dataDirectory, mutualAuthInfo, state)
 
     // Listen for user input to exit
     while (true) {
@@ -130,8 +132,9 @@ fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) {
     }
 
     // Clean up
-    logger.debug { "Stopping recording job" }
-    recordingJob.cancel()
+    logger.info { "stopping recording job" }
+    state.status = RecordingStatus.STOPPED
+    recordingJob.join()
 
     logger.info("all done")
 }

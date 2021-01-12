@@ -21,7 +21,7 @@ fun main(args: Array<String>) = runBlocking {
 
     val containingDirectory = Path(path)
     val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, duration, containingDirectory)
-    val newRecordings = recordContinuously(recorder)
+    val newRecordings = recordContinuously(recorder, RecordingState)
 
     @Suppress("MagicNumber")
     val count = 3

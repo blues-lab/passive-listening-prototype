@@ -63,13 +63,15 @@ class MultiSegmentRecorder(
 
 @ExperimentalCoroutinesApi
 @ExperimentalPathApi
-fun CoroutineScope.recordContinuously(recorder: MultiSegmentRecorder) =
+fun CoroutineScope.recordContinuously(recorder: MultiSegmentRecorder, state: RecordingState) =
     produce(capacity = RECORDING_CHANNEL_BUFFER_SIZE) {
         logger.debug("recording continuously")
 
-        while (true) {
+        while (state.status == RecordingStatus.ACTIVE) {
             send(recorder.recordNext())
         }
+
+        logger.info { "recording state is NOT ${RecordingStatus.ACTIVE}, returning" }
     }
 
 @ExperimentalPathApi
