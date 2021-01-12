@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS transcripts(
+    id INTEGER PRIMARY KEY,
+    audio_id INTEGER NOT NULL,
+    filename TEXT NOT NULL,
+    timestamp REAL,
+    duration REAL NOT NULL,
+    text TEXT,
+
+    FOREIGN KEY(audio_id) REFERENCES audio(id)
+);
+
+insert:
+INSERT INTO transcripts VALUES (NULL, ?, ?, ?, ?, ?);

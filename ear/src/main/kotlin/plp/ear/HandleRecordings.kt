@@ -20,6 +20,8 @@ const val DEFAULT_DURATION_SECONDS = 5
 
 private val logger = KotlinLogging.logger { }
 
+data class RegisteredRecording(val recording: Recording, val id: Long)
+
 @ExperimentalPathApi
 fun initDatabase(dataPath: Path): Database {
     // Create database paths and objects
@@ -52,7 +54,37 @@ fun CoroutineScope.registerRecordings(database: Database, recordings: ReceiveCha
             DEFAULT_DURATION_SECONDS.toDouble()
         ) // FIXME: use computed recording duration
 
-        send(recording)
+        val id = queries.lastInsertRowId().executeAsOne()
+
+        send(RegisteredRecording(recording, id))
+    }
+}
+
+@ExperimentalPathApi
+@ExperimentalCoroutinesApi
+fun CoroutineScope.transcribeRecordings(database: Database, records: ReceiveChannel<RegisteredRecording>) = produce {
+    val queries = database.transcriptQueries
+
+    for (record in records) {
+        val recording = record.recording
+        logger.debug { "transcribing recording $recording" }
+
+        // Get transcript
+        val text = "TODO"
+
+        // Save recording to database
+        val filename = recording.path.fileName.toString()
+        val timestamp = getTimestampFromRecording(recording)
+
+        queries.insert(
+            record.id,
+            filename,
+            timestamp.toDouble(),
+            DEFAULT_DURATION_SECONDS.toDouble(),
+            text
+        ) // FIXME: use computed recording duration
+
+        send(record)
     }
 }
 
@@ -66,9 +98,10 @@ fun runRecordingHub(dataDirectory: Path) {
     val recordingJob = GlobalScope.launch {
         val newRecordings = recordContinuously(recorder)
         val registeredRecordings = registerRecordings(database, newRecordings)
+        val transcribedRecordings = transcribeRecordings(database, registeredRecordings)
 
         var i = 0
-        registeredRecordings.consumeEach { nextRecording ->
+        transcribedRecordings.consumeEach { nextRecording ->
             logger.debug("finished processing recording $i of current session: $nextRecording")
 
             i++

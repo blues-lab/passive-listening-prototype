@@ -7,3 +7,6 @@ CREATE TABLE IF NOT EXISTS audio(
 
 insert:
 INSERT INTO audio VALUES (NULL, ?, ?, ?);
+
+lastInsertRowId:
+SELECT last_insert_rowid();
