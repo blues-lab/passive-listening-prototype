@@ -19,7 +19,7 @@ class TranscriptionService(private val modelPath: NioFilePath, private val tmpDi
     TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineImplBase() {
     @ExperimentalPathApi
     @Suppress("TooGenericExceptionCaught")
-    override suspend fun transcribeFile(request: Stt.TranscriptionRequest): Stt.TranscriptionResponse {
+    override suspend fun transcribeFile(request: Transcription.TranscriptionRequest): Transcription.TranscriptionResponse {
         logger.info { "handling request ${request.id}" }
 
         return try {
@@ -32,7 +32,7 @@ class TranscriptionService(private val modelPath: NioFilePath, private val tmpDi
             logger.debug { "cleaning up $tempFile now that transcription is done" }
             tempFile.deleteExisting()
 
-            Stt.TranscriptionResponse.newBuilder().setId(request.id).setText(text).build()
+            Transcription.TranscriptionResponse.newBuilder().setId(request.id).setText(text).build()
         } catch (e: Exception) {
             logger.error { e }
             throw e
