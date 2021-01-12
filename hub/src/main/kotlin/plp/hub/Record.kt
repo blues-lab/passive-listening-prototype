@@ -1,4 +1,4 @@
-package plp.ear
+package plp.hub
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

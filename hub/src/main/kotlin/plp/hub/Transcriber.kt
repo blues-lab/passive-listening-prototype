@@ -1,4 +1,4 @@
-package plp.ear
+package plp.hub
 
 import java.nio.file.Path
 

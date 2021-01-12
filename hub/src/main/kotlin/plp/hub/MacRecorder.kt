@@ -1,4 +1,4 @@
-package plp.ear
+package plp.hub
 
 import plp.common.runCommandAndGetOutput
 import plp.logging.KotlinLogging

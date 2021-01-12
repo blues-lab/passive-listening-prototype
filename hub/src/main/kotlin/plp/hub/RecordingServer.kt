@@ -1,4 +1,4 @@
-package plp.ear
+package plp.hub
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType

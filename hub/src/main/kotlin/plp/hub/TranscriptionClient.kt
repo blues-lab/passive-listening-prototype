@@ -1,4 +1,4 @@
-package plp.ear
+package plp.hub
 
 import Transcription
 import TranscriptionServiceGrpcKt
