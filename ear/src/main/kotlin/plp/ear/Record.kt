@@ -14,6 +14,9 @@ private const val RECORDING_FILE_EXTENSION = ".wav"
 
 val DEFAULT_RECORDER = RecordJava
 
+/** How many recordings to buffer before pausing recording */
+const val RECORDING_CHANNEL_BUFFER_SIZE = 3
+
 private val logger = KotlinLogging.logger {}
 
 /**
@@ -60,13 +63,14 @@ class MultiSegmentRecorder(
 
 @ExperimentalCoroutinesApi
 @ExperimentalPathApi
-fun CoroutineScope.recordContinuously(recorder: MultiSegmentRecorder) = produce {
-    logger.debug("recording continuously")
+fun CoroutineScope.recordContinuously(recorder: MultiSegmentRecorder) =
+    produce(capacity = RECORDING_CHANNEL_BUFFER_SIZE) {
+        logger.debug("recording continuously")
 
-    while (true) {
-        send(recorder.recordNext())
+        while (true) {
+            send(recorder.recordNext())
+        }
     }
-}
 
 @ExperimentalPathApi
 fun recordingFlow(recorder: MultiSegmentRecorder) = flow {
