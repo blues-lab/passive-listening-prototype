@@ -11,10 +11,16 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.nameWithoutExtension
 
 @ExperimentalPathApi
+fun getTimestampFromRecording(recording: Recording): Int {
+    return recording.path.nameWithoutExtension.toInt()
+}
+
+@ExperimentalPathApi
 internal fun serializeRecording(recording: Recording): AudioRecordingOuterClass.Recording {
     val audioFilePath = recording.path
     val audioBytes = ByteString.readFrom(audioFilePath.inputStream())
-    val timestamp = audioFilePath.nameWithoutExtension.toInt()
+    val timestamp = getTimestampFromRecording(recording)
+
     return AudioRecordingOuterClass.Recording.newBuilder()
         .setAudio(audioBytes)
         .setTimestamp(timestamp)
