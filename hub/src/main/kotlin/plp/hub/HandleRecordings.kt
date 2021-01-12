@@ -5,6 +5,7 @@ import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
@@ -95,13 +96,13 @@ fun CoroutineScope.transcribeRecordings(
 
 @ExperimentalCoroutinesApi
 @ExperimentalPathApi
-fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) {
+fun launchRecordingPipeline(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo): Job {
     val database = initDatabase(dataDirectory)
     val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, DEFAULT_DURATION_SECONDS, dataDirectory)
     val transcriber = MutualAuthTranscriptionClient(mutualAuthInfo)
 
     logger.debug { "launching recording job" }
-    val recordingJob = GlobalScope.launch {
+    return GlobalScope.launch {
         val newRecordings = recordContinuously(recorder)
         val registeredRecordings = registerRecordings(database, newRecordings)
         val transcribedRecordings = transcribeRecordings(database, transcriber, registeredRecordings)
@@ -113,6 +114,12 @@ fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) {
             i++
         }
     }
+}
+
+@ExperimentalCoroutinesApi
+@ExperimentalPathApi
+fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) {
+    val recordingJob = launchRecordingPipeline(dataDirectory, mutualAuthInfo)
 
     // Listen for user input to exit
     while (true) {
