@@ -3,8 +3,8 @@ package plp.ear
 import Transcription
 import TranscriptionServiceGrpcKt
 import com.google.protobuf.ByteString
-import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
+import plp.common.rpc.MutualAuthInfo
 import plp.logging.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -16,18 +16,14 @@ const val TRANSCRIPTION_SERVICE_PORT = 50058
 private val logger = KotlinLogging.logger {}
 
 @ExperimentalPathApi
-class MutualAuthTranscriptionClient(root: Path, cert: Path, key: Path) :
+class MutualAuthTranscriptionClient(mutualAuthInfo: MutualAuthInfo) :
     Transcriber {
     private val stub: TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineStub
 
     init {
-        val sslContext = GrpcSslContexts.forClient()
-            .trustManager(root.toFile())
-            .keyManager(cert.toFile(), key.toFile())
-            .build()
         val channel = NettyChannelBuilder.forAddress(TRANSCRIPTION_SERVICE_HOST, TRANSCRIPTION_SERVICE_PORT)
             .useTransportSecurity()
-            .sslContext(sslContext)
+            .sslContext(mutualAuthInfo.sslContext)
             .build()
 
         stub = TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineStub(channel)

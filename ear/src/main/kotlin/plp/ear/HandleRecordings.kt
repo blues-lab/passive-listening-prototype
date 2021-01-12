@@ -9,6 +9,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.launch
+import plp.common.rpc.MutualAuthInfo
 import plp.data.Database
 import plp.logging.KotlinLogging
 import java.nio.file.Path
@@ -62,7 +63,11 @@ fun CoroutineScope.registerRecordings(database: Database, recordings: ReceiveCha
 
 @ExperimentalPathApi
 @ExperimentalCoroutinesApi
-fun CoroutineScope.transcribeRecordings(database: Database, records: ReceiveChannel<RegisteredRecording>) = produce {
+fun CoroutineScope.transcribeRecordings(
+    database: Database,
+    transcriber: Transcriber,
+    records: ReceiveChannel<RegisteredRecording>
+) = produce {
     val queries = database.transcriptQueries
 
     for (record in records) {
@@ -70,7 +75,7 @@ fun CoroutineScope.transcribeRecordings(database: Database, records: ReceiveChan
         logger.debug { "transcribing recording $recording" }
 
         // Get transcript
-        val text = "TODO"
+        val text = transcriber.transcribeFile(recording.path)
 
         // Save recording to database
         val filename = recording.path.fileName.toString()
@@ -90,15 +95,16 @@ fun CoroutineScope.transcribeRecordings(database: Database, records: ReceiveChan
 
 @ExperimentalCoroutinesApi
 @ExperimentalPathApi
-fun runRecordingHub(dataDirectory: Path) {
+fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) {
     val database = initDatabase(dataDirectory)
     val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, DEFAULT_DURATION_SECONDS, dataDirectory)
+    val transcriber = MutualAuthTranscriptionClient(mutualAuthInfo)
 
     logger.debug { "launching recording job" }
     val recordingJob = GlobalScope.launch {
         val newRecordings = recordContinuously(recorder)
         val registeredRecordings = registerRecordings(database, newRecordings)
-        val transcribedRecordings = transcribeRecordings(database, registeredRecordings)
+        val transcribedRecordings = transcribeRecordings(database, transcriber, registeredRecordings)
 
         var i = 0
         transcribedRecordings.consumeEach { nextRecording ->
