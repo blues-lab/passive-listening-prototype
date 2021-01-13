@@ -26,7 +26,7 @@ sqldelight {
     }
 }
 
-val main = "plp.ear.MainKt"
+val main = "plp.hub.MainKt"
 
 application {
     mainClassName = main // needed for shadow plugin
