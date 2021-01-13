@@ -49,7 +49,7 @@ ktlint {
 }
 
 detekt {
-    toolVersion = "1.15.0-RC2"
+    toolVersion = "1.15.0"
     config = files("${rootDir}/detekt.yml")
     buildUponDefaultConfig = true
 }
