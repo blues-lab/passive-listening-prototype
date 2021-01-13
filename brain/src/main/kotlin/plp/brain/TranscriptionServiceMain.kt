@@ -2,6 +2,7 @@ package plp.brain
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
+import kotlinx.cli.default
 import kotlinx.cli.required
 import plp.common.configureLogging
 import plp.common.resolveHomeDirectory
@@ -21,12 +22,19 @@ fun main(args: Array<String>) {
     val root by parser.option(ArgType.String).required()
     val model by parser.option(ArgType.String).required()
     val tmpDir by parser.option(ArgType.String).required()
+    val fake by parser.option(
+        ArgType.Boolean,
+        description = "respond with fake transcriptions instead of actually invoking the transcription process"
+    ).default(false)
     parser.parse(args)
 
     val logger = KotlinLogging.logger {}
     logger.info("starting Transcription server")
 
-    val service = TranscriptionService(Path(resolveHomeDirectory(model)), Path(resolveHomeDirectory(tmpDir)))
+    val service = if (fake) FakeTranscriptionService() else TranscriptionService(
+        Path(resolveHomeDirectory(model)),
+        Path(resolveHomeDirectory(tmpDir))
+    )
     val server = MutualTlsGrpcServer(service, DEFAULT_PORT, cert, key, root)
     server.start()
     server.blockUntilShutdown()
