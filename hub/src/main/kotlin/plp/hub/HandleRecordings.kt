@@ -134,13 +134,32 @@ fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) = runBl
 
     // Listen for user input to exit
     while (true) {
-        println("Recording is running. Press CTRL-D to exit")
-        readLine() ?: break
+        println(
+            "Recording is ${
+            state.status.toString().toLowerCase()
+            }. Type anything followed by Enter to toggle recording. Press CTRL-D to exit."
+        )
+        readLine() ?: break // break out of loop on EOF (CTRL-D)
+
+        // Toggle recording status (on any other input)
+        when (state.status) {
+            RecordingStatus.ACTIVE -> {
+                logger.info { "pausing recording" }
+                state.status = RecordingStatus.PAUSED
+            }
+            RecordingStatus.PAUSED -> {
+                logger.info { "restarting recording" }
+                state.status = RecordingStatus.ACTIVE
+            }
+            RecordingStatus.CANCELED -> {
+                logger.warning("recording status is unexpectedly ${state.status}")
+            }
+        }
     }
 
     // Gracefully stop recording
     logger.info { "stopping recording job" }
-    state.status = RecordingStatus.STOPPED
+    state.status = RecordingStatus.CANCELED
     recordingJob.join()
     logger.info { "recording pipeline has been shut downt" }
 

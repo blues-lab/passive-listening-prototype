@@ -1,8 +1,9 @@
 package plp.hub
 
 enum class RecordingStatus {
-    STOPPED,
     ACTIVE,
+    PAUSED,
+    CANCELED,
 }
 
 object RecordingState {

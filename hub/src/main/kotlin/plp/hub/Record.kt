@@ -3,6 +3,7 @@ package plp.hub
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import plp.logging.KotlinLogging
 import java.nio.file.Path
@@ -16,6 +17,9 @@ val DEFAULT_RECORDER = RecordJava
 
 /** How many recordings to buffer before pausing recording */
 const val RECORDING_CHANNEL_BUFFER_SIZE = 3
+
+/** When recording is paused, we'll sleep this long until checking whether we should resume */
+const val SLEEP_INTERVAL_WHEN_RECORDING_IS_PAUSED = 5000L
 
 private val logger = KotlinLogging.logger {}
 
@@ -67,11 +71,19 @@ fun CoroutineScope.recordContinuously(recorder: MultiSegmentRecorder, state: Rec
     produce(capacity = RECORDING_CHANNEL_BUFFER_SIZE) {
         logger.debug("recording continuously")
 
-        while (state.status == RecordingStatus.ACTIVE) {
-            send(recorder.recordNext())
+        while (true) {
+            logger.debug { "recording status is ${state.status}" }
+            when (state.status) {
+                RecordingStatus.ACTIVE -> send(recorder.recordNext())
+                RecordingStatus.PAUSED -> {
+                    logger.debug { "sleeping for $SLEEP_INTERVAL_WHEN_RECORDING_IS_PAUSED because recording is paused" }
+                    delay(SLEEP_INTERVAL_WHEN_RECORDING_IS_PAUSED)
+                }
+                RecordingStatus.CANCELED -> break
+            }
         }
 
-        logger.info { "recording state is NOT ${RecordingStatus.ACTIVE}, returning" }
+        logger.info { "recording state is ${RecordingStatus.CANCELED}, returning" }
     }
 
 @ExperimentalPathApi
