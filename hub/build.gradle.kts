@@ -18,6 +18,11 @@ dependencies {
     implementation("io.grpc:grpc-netty-shaded:1.34.1")
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
     implementation("com.squareup.sqldelight:sqlite-driver:1.4.4")
+    implementation("io.ktor:ktor-server-netty:1.5.0")
+}
+
+repositories {
+    jcenter()
 }
 
 sqldelight {

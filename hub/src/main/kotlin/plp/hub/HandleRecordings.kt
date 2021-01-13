@@ -125,16 +125,27 @@ fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) = runBl
     val state = RecordingState
     val recordingJob = launchRecordingPipeline(dataDirectory, mutualAuthInfo, state)
 
+    val server = startWebserver()
+
     // Listen for user input to exit
     while (true) {
         println("Recording is running. Press CTRL-D to exit")
         readLine() ?: break
     }
 
-    // Clean up
+    // Gracefully stop recording
     logger.info { "stopping recording job" }
     state.status = RecordingStatus.STOPPED
     recordingJob.join()
+    logger.info { "recording pipeline has been shut downt" }
 
-    logger.info("all done")
+    while (true) {
+        println("Recording pipeline is shut down and won't start again. Server is still running. Press CTRL-D to stop it.")
+        readLine() ?: break
+    }
+
+    logger.info { "stopping web server" }
+    server.stop(WEB_SERVICE_SHUTDOWN_TIMEOUT_MS, WEB_SERVICE_SHUTDOWN_TIMEOUT_MS)
+
+    logger.info("all done, exiting")
 }
