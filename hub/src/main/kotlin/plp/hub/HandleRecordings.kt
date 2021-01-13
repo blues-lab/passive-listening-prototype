@@ -76,20 +76,25 @@ fun CoroutineScope.transcribeRecordings(
         val recording = record.recording
         logger.debug { "transcribing recording $recording" }
 
-        // Get transcript
-        val text = transcriber.transcribeFile(recording.path)
+        try {
 
-        // Save recording to database
-        val filename = recording.path.fileName.toString()
-        val timestamp = getTimestampFromRecording(recording)
+            // Get transcript
+            val text = transcriber.transcribeFile(recording.path)
 
-        queries.insert(
-            record.id,
-            filename,
-            timestamp.toDouble(),
-            DEFAULT_DURATION_SECONDS.toDouble(),
-            text
-        ) // FIXME: use computed recording duration
+            // Save recording to database
+            val filename = recording.path.fileName.toString()
+            val timestamp = getTimestampFromRecording(recording)
+
+            queries.insert(
+                record.id,
+                filename,
+                timestamp.toDouble(),
+                DEFAULT_DURATION_SECONDS.toDouble(),
+                text
+            ) // FIXME: use computed recording duration
+        } catch (err: io.grpc.StatusException) {
+            logger.error("transcription failed: $err")
+        }
 
         send(record)
     }
