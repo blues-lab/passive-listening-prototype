@@ -29,6 +29,12 @@ fun Application.module() {
         get("/") {
             call.respondText("Hello world", ContentType.Text.Html)
         }
+
+        get("/recording/status") {
+            val status = RecordingState.status.toString()
+            call.respondText(status, ContentType.Text.Plain)
+        }
+
         post("/recording/start") {
             logger.debug { "received start request; current status is ${RecordingState.status}" }
             when (RecordingState.status) {
@@ -43,8 +49,9 @@ fun Application.module() {
                     call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
                 }
             }
-            logger.debug { "new recording status is ${RecordingState.status}"}
+            logger.debug { "new recording status is ${RecordingState.status}" }
         }
+
         post("/recording/stop") {
             logger.debug { "received start request; current status is ${RecordingState.status}" }
             when (RecordingState.status) {
@@ -59,7 +66,7 @@ fun Application.module() {
                     call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
                 }
             }
-            logger.debug { "new recording status is ${RecordingState.status}"}
+            logger.debug { "new recording status is ${RecordingState.status}" }
         }
     }
 }
