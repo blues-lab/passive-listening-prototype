@@ -9,7 +9,7 @@ plugins {
     id("com.google.protobuf")
 }
 
-val grpcVersion = "1.34.1"
+val grpcVersion = "1.35.0"
 val grpcKotlinVersion = "1.0.0"
 val protobufVersion = "3.14.0"
 
@@ -23,7 +23,7 @@ allprojects {
 dependencies {
     api("com.google.protobuf:protobuf-java-util:$protobufVersion")
     api("io.grpc:grpc-kotlin-stub:1.0.0")
-    implementation("io.grpc:grpc-netty-shaded:1.34.1")
+    implementation("io.grpc:grpc-netty-shaded:$grpcVersion")
 }
 
 protobuf {
