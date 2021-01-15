@@ -6,9 +6,11 @@ import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.DefaultHeaders
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
+import io.ktor.routing.post
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -27,12 +29,45 @@ fun Application.module() {
         get("/") {
             call.respondText("Hello world", ContentType.Text.Html)
         }
+        post("/recording/start") {
+            logger.debug { "received start request; current status is ${RecordingState.status}" }
+            when (RecordingState.status) {
+                RecordingStatus.ACTIVE -> {
+                    call.respondText("No change") // TODO: provide standardized JSON response
+                }
+                RecordingStatus.PAUSED -> {
+                    RecordingState.status = RecordingStatus.ACTIVE
+                    call.respondText("OK")
+                }
+                RecordingStatus.CANCELED -> {
+                    call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
+                }
+            }
+            logger.debug { "new recording status is ${RecordingState.status}"}
+        }
+        post("/recording/stop") {
+            logger.debug { "received start request; current status is ${RecordingState.status}" }
+            when (RecordingState.status) {
+                RecordingStatus.ACTIVE -> {
+                    RecordingState.status = RecordingStatus.PAUSED
+                    call.respondText("OK")
+                }
+                RecordingStatus.PAUSED -> {
+                    call.respondText("No change") // TODO: provide standardized JSON response
+                }
+                RecordingStatus.CANCELED -> {
+                    call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
+                }
+            }
+            logger.debug { "new recording status is ${RecordingState.status}"}
+        }
     }
 }
 
 fun startWebserver(): ApplicationEngine {
     logger.debug { "starting web server" }
-    val server = embeddedServer(Netty, WEB_SERVICE_PORT, watchPaths = listOf("WebServiceKt"), module = Application::module)
+    val server =
+        embeddedServer(Netty, WEB_SERVICE_PORT, watchPaths = listOf("WebServiceKt"), module = Application::module)
     server.start()
     logger.debug { "started web server" }
     return server
