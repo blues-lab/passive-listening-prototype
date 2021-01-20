@@ -1,7 +1,5 @@
 package plp.hub
 
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -16,7 +14,6 @@ import plp.data.Database
 import plp.logging.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.div
 
 /** How long each recording should be, by default */
 const val DEFAULT_DURATION_SECONDS = 5
@@ -26,39 +23,10 @@ private val logger = KotlinLogging.logger { }
 data class RegisteredRecording(val recording: Recording, val id: Long)
 
 @ExperimentalPathApi
-fun initDatabase(dataPath: Path): Database {
-    // Create database paths and objects
-    val dbPath = dataPath / "db.sqlite"
-    val dbConnection = "jdbc:sqlite:$dbPath"
-    val driver: SqlDriver = JdbcSqliteDriver(dbConnection)
-    val database = Database(driver)
-
-    // Make sure database is initialized with schema
-    Database.Schema.create(driver)
-
-    return database
-}
-
-@ExperimentalPathApi
 @ExperimentalCoroutinesApi
 fun CoroutineScope.registerRecordings(database: Database, recordings: ReceiveChannel<Recording>) = produce {
-    val queries = database.audioQueries
-
     for (recording in recordings) {
-        logger.debug { "registering recording $recording" }
-
-        val filename = recording.path.fileName.toString()
-        val timestamp = getTimestampFromRecording(recording)
-
-        // Save recording to database
-        queries.insert(
-            filename,
-            timestamp.toLong(),
-            DEFAULT_DURATION_SECONDS.toDouble()
-        ) // FIXME: use computed recording duration
-
-        val id = queries.lastInsertRowId().executeAsOne()
-
+        val id = database.registerRecording(recording)
         send(RegisteredRecording(recording, id))
     }
 }
@@ -70,28 +38,13 @@ fun CoroutineScope.transcribeRecordings(
     transcriber: Transcriber,
     records: ReceiveChannel<RegisteredRecording>
 ) = produce {
-    val queries = database.transcriptQueries
-
     for (record in records) {
         val recording = record.recording
         logger.debug { "transcribing recording $recording" }
 
         try {
-
-            // Get transcript
             val text = transcriber.transcribeFile(recording.path)
-
-            // Save recording to database
-            val filename = recording.path.fileName.toString()
-            val timestamp = getTimestampFromRecording(recording)
-
-            queries.insert(
-                record.id,
-                filename,
-                timestamp.toDouble(),
-                DEFAULT_DURATION_SECONDS.toDouble(),
-                text
-            ) // FIXME: use computed recording duration
+            database.saveTranscript(record, text)
         } catch (err: io.grpc.StatusException) {
             logger.error("transcription failed: $err")
         }
