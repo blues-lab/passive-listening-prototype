@@ -3,7 +3,7 @@ package plp.hub
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import plp.data.Database
-import plp.data.Transcripts
+import plp.data.Transcript
 import plp.logging.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -69,7 +69,7 @@ fun Database.saveTranscript(recording: RegisteredRecording, text: String) {
     ) // FIXME: use computed recording duration
 }
 
-fun Database.selectAll(): List<Transcripts> {
+fun Database.selectAll(): List<Transcript> {
     val queries = this.transcriptQueries
 
     return queries.select().executeAsList()

@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS transcripts(
+CREATE TABLE IF NOT EXISTS transcript(
     id INTEGER PRIMARY KEY,
     audio_id INTEGER NOT NULL,
     filename TEXT NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS transcripts(
 );
 
 insert:
-INSERT INTO transcripts VALUES (NULL, ?, ?, ?, ?, ?);
+INSERT INTO transcript VALUES (NULL, ?, ?, ?, ?, ?);
 
 select:
-SELECT * FROM transcripts;
+SELECT * FROM transcript;
