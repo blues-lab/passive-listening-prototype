@@ -11,3 +11,6 @@ CREATE TABLE IF NOT EXISTS transcripts(
 
 insert:
 INSERT INTO transcripts VALUES (NULL, ?, ?, ?, ?, ?);
+
+select:
+SELECT * FROM transcripts;

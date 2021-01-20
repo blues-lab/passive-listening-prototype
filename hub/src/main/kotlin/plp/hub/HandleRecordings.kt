@@ -57,6 +57,7 @@ fun CoroutineScope.transcribeRecordings(
 @ExperimentalPathApi
 fun launchRecordingPipeline(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo, state: RecordingState): Job {
     val database = initDatabase(dataDirectory)
+    state.database = database
     val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, DEFAULT_DURATION_SECONDS, dataDirectory)
     val transcriber = MutualAuthTranscriptionClient(mutualAuthInfo)
 

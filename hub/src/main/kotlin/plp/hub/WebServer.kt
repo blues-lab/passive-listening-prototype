@@ -4,6 +4,7 @@ import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CallLogging
+import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -11,6 +12,7 @@ import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
+import io.ktor.serialization.json
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -25,7 +27,14 @@ private val logger = KotlinLogging.logger { }
 fun Application.module() {
     install(DefaultHeaders)
     install(CallLogging)
+
+    install(ContentNegotiation) {
+        json()
+    }
+
     install(Routing) {
+        returnAllRecordings()
+
         get("/") {
             call.respondText("Hello world", ContentType.Text.Html)
         }
