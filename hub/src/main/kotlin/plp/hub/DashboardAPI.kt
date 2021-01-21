@@ -40,7 +40,7 @@ private fun transcriptToChunk(transcript: Transcript): RecordingChunk {
 }
 
 fun Route.returnAllRecordings() {
-    get("/recording/all") {
+    get("/data") {
         val database = RecordingState.database
         if (database == null) {
             call.respondText(text = "Database not initialized", status = HttpStatusCode.InternalServerError)
