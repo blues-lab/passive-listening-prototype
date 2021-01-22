@@ -42,7 +42,7 @@ fun Application.module() {
             defaultResource("index.html", "dashboard")
         }
 
-        returnAllRecordings()
+        returnRecordings()
 
         get("/") {
             call.respondRedirect("/dashboard")

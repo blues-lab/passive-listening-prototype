@@ -39,7 +39,7 @@ private fun transcriptToChunk(transcript: Transcript): RecordingChunk {
     }
 }
 
-fun Route.returnAllRecordings() {
+fun Route.returnRecordings() {
     get("/data") {
         val database = RecordingState.database
         if (database == null) {
@@ -47,7 +47,9 @@ fun Route.returnAllRecordings() {
             return@get
         }
 
-        val chunks = database.selectAll().map(::transcriptToChunk)
+        val cutoff: Int = call.request.queryParameters["cutoff"]?.toIntOrNull() ?: 0
+
+        val chunks = database.selectAfterTimestamp(cutoff).map(::transcriptToChunk)
 
         call.respond(chunks)
     }

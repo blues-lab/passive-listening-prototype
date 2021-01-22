@@ -69,8 +69,8 @@ fun Database.saveTranscript(recording: RegisteredRecording, text: String) {
     ) // FIXME: use computed recording duration
 }
 
-fun Database.selectAll(): List<Transcript> {
+fun Database.selectAfterTimestamp(cutoff: Int = 0): List<Transcript> {
     val queries = this.transcriptQueries
 
-    return queries.select().executeAsList()
+    return queries.selectAfterTimestamp(cutoff.toDouble()).executeAsList()
 }

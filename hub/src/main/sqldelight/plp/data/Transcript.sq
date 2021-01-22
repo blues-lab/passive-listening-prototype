@@ -14,3 +14,6 @@ INSERT INTO transcript VALUES (NULL, ?, ?, ?, ?, ?);
 
 select:
 SELECT * FROM transcript;
+
+selectAfterTimestamp:
+SELECT * FROM transcript WHERE timestamp > ?;
