@@ -8,6 +8,10 @@ import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.defaultResource
+import io.ktor.http.content.resources
+import io.ktor.http.content.static
+import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
@@ -33,10 +37,15 @@ fun Application.module() {
     }
 
     install(Routing) {
+        static("dashboard") {
+            resources("dashboard")
+            defaultResource("index.html", "dashboard")
+        }
+
         returnAllRecordings()
 
         get("/") {
-            call.respondText("Hello world", ContentType.Text.Html)
+            call.respondRedirect("/dashboard")
         }
 
         get("/recording/status") {
