@@ -8,8 +8,8 @@ import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.defaultResource
-import io.ktor.http.content.resources
+import io.ktor.http.content.default
+import io.ktor.http.content.files
 import io.ktor.http.content.static
 import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
@@ -21,6 +21,10 @@ import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import plp.logging.KotlinLogging
+import java.nio.file.Path
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.Path
+import kotlin.io.path.div
 
 const val WEB_SERVICE_PORT = 8080
 
@@ -28,6 +32,12 @@ const val WEB_SERVICE_SHUTDOWN_TIMEOUT_MS = 5000L
 
 private val logger = KotlinLogging.logger { }
 
+/** Path in the local filesystem to static assets containing the frontend */
+@ExperimentalPathApi
+val DASHBOARD_PATH: Path = Path(System.getenv("DASHBOARD_PATH")
+    ?: "dashboard".also { logger.warning("DASHBOARD_PATH not specified in environment; using default path (./dashboard)") })
+
+@ExperimentalPathApi
 fun Application.module() {
     install(DefaultHeaders)
     install(CallLogging)
@@ -38,8 +48,8 @@ fun Application.module() {
 
     install(Routing) {
         static("dashboard") {
-            resources("dashboard")
-            defaultResource("index.html", "dashboard")
+            files(DASHBOARD_PATH.toFile())
+            default((DASHBOARD_PATH / "index.html").toFile())
         }
 
         returnRecordings()
@@ -89,6 +99,7 @@ fun Application.module() {
     }
 }
 
+@ExperimentalPathApi
 fun startWebserver(): ApplicationEngine {
     logger.debug { "starting web server" }
     val server =
