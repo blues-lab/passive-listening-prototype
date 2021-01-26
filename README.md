@@ -6,6 +6,7 @@ This is the main repo for the passive listening prototype.
 ## Structure
 
 - buildSrc - build settings shared across the project
+- classify_cli - a small CLI client for testing the classification service
 - common - code shared between subproject
 - gradle - [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html)
 - hub - code that runs on the "primary" device (e.g., the Raspbery Pi).
