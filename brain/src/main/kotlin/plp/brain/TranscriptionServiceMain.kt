@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
         ArgType.String,
         description = "the directory containing the wav2letter model. If omitted, server will respond with fake transcriptions instead of actually invoking the transcription process"
     )
-    val tmpDir by parser.option(ArgType.String).required()
+    val tmpDir by parser.option(ArgType.String, description = "path for storing files being transcribed").required()
     val root by parser.option(ArgType.String, description = "path to root certificate chain, if using mutual TLS")
     val key by parser.option(ArgType.String, description = "path to secret key file, if using TLS")
     val cert by parser.option(ArgType.String, description = "path to public certificate, if using TLS")
