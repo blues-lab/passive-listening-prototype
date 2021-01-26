@@ -10,7 +10,7 @@ import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.inputStream
 
 const val TRANSCRIPTION_SERVICE_HOST = "localhost"
-const val TRANSCRIPTION_SERVICE_PORT = plp.common.rpc.DEFAULT_PORT
+const val TRANSCRIPTION_SERVICE_PORT = plp.common.rpc.server.DEFAULT_PORT
 
 private val logger = KotlinLogging.logger {}
 

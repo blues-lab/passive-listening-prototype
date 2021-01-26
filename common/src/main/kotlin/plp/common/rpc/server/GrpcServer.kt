@@ -1,4 +1,4 @@
-package plp.common.rpc
+package plp.common.rpc.server
 
 import io.grpc.Server
 import plp.logging.KotlinLogging

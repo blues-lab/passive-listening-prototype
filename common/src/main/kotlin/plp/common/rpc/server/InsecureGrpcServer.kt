@@ -1,4 +1,4 @@
-package plp.common.rpc
+package plp.common.rpc.server
 
 import io.grpc.ServerBuilder
 import io.grpc.kotlin.AbstractCoroutineServerImpl
