@@ -2,3 +2,5 @@ style:
   active: true
   MaxLineLength:
     active: false
+  ForbiddenComment:
+    active: false
