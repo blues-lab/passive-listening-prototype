@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package plp.proto;
+
+service ClassificationService {
+  rpc ClassifyText (ClassificationRequest) returns (ClassificationResponse) {}
+}
+
+message ClassificationRequest {
+  /** A unique identifier for the text being classified */
+  int32 id = 1;
+  /** The text being classified */
+  string text = 10;
+}
+
+message ClassificationResponse {
+  /** The name or identifier of the classifier returning this result */
+  string classifierName = 1;
+  /** The most likely classification for the given text */
+  string classification = 10;
+  /** The confidence for the most likely classification for the given text */
+  float confidence = 20;
+  /** Any additional information the classifier wants to record */
+  string extras = 30;
+}
