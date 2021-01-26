@@ -5,9 +5,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import plp.common.currentUnixTime
 import plp.logging.KotlinLogging
 import java.nio.file.Path
-import java.time.Instant
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.div
 
@@ -22,13 +22,6 @@ const val RECORDING_CHANNEL_BUFFER_SIZE = 3
 const val SLEEP_INTERVAL_WHEN_RECORDING_IS_PAUSED = 5000L
 
 private val logger = KotlinLogging.logger {}
-
-/**
- * Return the number of seconds since the Unix epoch
- */
-fun currentUnixTime(): Int {
-    return Instant.now().epochSecond.toInt()
-}
 
 @ExperimentalPathApi
 fun pathToNextRecording(directory: Path): Path {
