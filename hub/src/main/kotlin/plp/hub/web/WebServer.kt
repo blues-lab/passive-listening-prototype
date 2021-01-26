@@ -1,4 +1,4 @@
-package plp.hub
+package plp.hub.web
 
 import io.ktor.application.Application
 import io.ktor.application.call
@@ -20,6 +20,8 @@ import io.ktor.serialization.json
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import plp.hub.RecordingState
+import plp.hub.RecordingStatus
 import plp.logging.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi

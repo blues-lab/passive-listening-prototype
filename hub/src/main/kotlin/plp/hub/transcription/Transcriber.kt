@@ -1,4 +1,4 @@
-package plp.hub
+package plp.hub.transcription
 
 import java.nio.file.Path
 

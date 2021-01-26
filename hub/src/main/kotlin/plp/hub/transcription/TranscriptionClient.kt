@@ -1,4 +1,4 @@
-package plp.hub
+package plp.hub.transcription
 
 import Transcription
 import TranscriptionServiceGrpcKt
@@ -6,6 +6,8 @@ import com.google.protobuf.ByteString
 import plp.common.TRANSCRIPTION_SERVICE_HOST
 import plp.common.TRANSCRIPTION_SERVICE_PORT
 import plp.common.rpc.GrpcChannelChoice
+import plp.hub.Recording
+import plp.hub.getTimestampFromRecording
 import plp.logging.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
