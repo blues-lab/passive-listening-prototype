@@ -1,4 +1,4 @@
-package plp.brain
+package plp.transcribe
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType

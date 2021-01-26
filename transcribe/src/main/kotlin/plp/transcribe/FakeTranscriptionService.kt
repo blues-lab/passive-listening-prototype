@@ -1,4 +1,4 @@
-package plp.brain
+package plp.transcribe
 
 import Transcription
 import TranscriptionServiceGrpcKt

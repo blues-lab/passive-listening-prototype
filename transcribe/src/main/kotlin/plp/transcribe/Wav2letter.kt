@@ -1,4 +1,4 @@
-package plp.brain
+package plp.transcribe
 
 import plp.common.runCommandAndGetOutput
 import plp.logging.KotlinLogging

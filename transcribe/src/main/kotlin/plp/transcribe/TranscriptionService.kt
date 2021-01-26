@@ -1,4 +1,4 @@
-package plp.brain
+package plp.transcribe
 
 import plp.logging.KotlinLogging
 import kotlin.io.path.ExperimentalPathApi
