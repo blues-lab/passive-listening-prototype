@@ -3,14 +3,13 @@ package plp.hub
 import Transcription
 import TranscriptionServiceGrpcKt
 import com.google.protobuf.ByteString
+import plp.common.TRANSCRIPTION_SERVICE_HOST
+import plp.common.TRANSCRIPTION_SERVICE_PORT
 import plp.common.rpc.GrpcChannelChoice
 import plp.logging.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.inputStream
-
-const val TRANSCRIPTION_SERVICE_HOST = "localhost"
-const val TRANSCRIPTION_SERVICE_PORT = plp.common.rpc.server.DEFAULT_PORT
 
 private val logger = KotlinLogging.logger {}
 

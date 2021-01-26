@@ -30,7 +30,7 @@ internal fun makeSslContext(
 
 class MutualTlsGrpcServer(
     service: AbstractCoroutineServerImpl,
-    port: Int = DEFAULT_PORT,
+    port: Int,
     certChainFilePath: String,
     privateKeyFilePath: String,
     trustCertCollectionFilePath: String,

@@ -3,8 +3,6 @@ package plp.common.rpc.server
 import io.grpc.Server
 import plp.logging.KotlinLogging
 
-const val DEFAULT_PORT = 50057
-
 private val logger = KotlinLogging.logger {}
 open class GrpcServer(
     private val server: Server

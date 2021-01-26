@@ -4,9 +4,9 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
 import kotlinx.cli.required
+import plp.common.TRANSCRIPTION_SERVICE_PORT
 import plp.common.configureLogging
 import plp.common.resolveHomeDirectory
-import plp.common.rpc.server.DEFAULT_PORT
 import plp.common.rpc.server.MutualTlsGrpcServer
 import plp.logging.KotlinLogging
 import kotlin.io.path.ExperimentalPathApi
@@ -35,7 +35,7 @@ fun main(args: Array<String>) {
         Path(resolveHomeDirectory(model)),
         Path(resolveHomeDirectory(tmpDir))
     )
-    val server = MutualTlsGrpcServer(service, DEFAULT_PORT, cert, key, root)
+    val server = MutualTlsGrpcServer(service, TRANSCRIPTION_SERVICE_PORT, cert, key, root)
     server.start()
     server.blockUntilShutdown()
 }

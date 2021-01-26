@@ -3,14 +3,14 @@ package plp.brain
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import kotlinx.coroutines.flow.Flow
+import plp.common.RECORDING_SERVICE_HOST
+import plp.common.RECORDING_SERVICE_PORT
 import plp.logging.KotlinLogging
 import plp.proto.AudioRecordingGrpcKt
 import plp.proto.AudioRecordingOuterClass
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 
-const val EAR_HOST = "localhost"
-private const val DEFAULT_PORT = 50058
 const val RECORDING_SEGMENT_DURATION_SECONDS = 5
 
 private val logger = KotlinLogging.logger {}
@@ -29,7 +29,7 @@ class MutualAuthRecordingClient(private val root: Path, private val cert: Path, 
             .trustManager(root.toFile())
             .keyManager(cert.toFile(), key.toFile())
             .build()
-        val channel = NettyChannelBuilder.forAddress(EAR_HOST, DEFAULT_PORT).useTransportSecurity()
+        val channel = NettyChannelBuilder.forAddress(RECORDING_SERVICE_HOST, RECORDING_SERVICE_PORT).useTransportSecurity()
             .sslContext(sslContext)
             .build()
 

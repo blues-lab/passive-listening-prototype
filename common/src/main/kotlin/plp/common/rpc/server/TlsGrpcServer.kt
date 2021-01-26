@@ -8,7 +8,7 @@ private val logger = KotlinLogging.logger {}
 
 class TlsGrpcServer(
     service: AbstractCoroutineServerImpl,
-    private val port: Int = DEFAULT_PORT,
+    private val port: Int,
     certChainFilePath: String,
     privateKeyFilePath: String,
 ) : GrpcServer(
