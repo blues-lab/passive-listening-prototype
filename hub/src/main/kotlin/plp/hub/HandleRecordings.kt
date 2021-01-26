@@ -82,6 +82,7 @@ fun launchRecordingPipeline(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo,
 @ExperimentalPathApi
 fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) = runBlocking {
     val state = RecordingState
+    state.audioFileDirectory = dataDirectory
     val recordingJob = launchRecordingPipeline(dataDirectory, mutualAuthInfo, state)
 
     val server = startWebserver()

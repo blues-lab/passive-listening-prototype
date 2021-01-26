@@ -34,8 +34,10 @@ private val logger = KotlinLogging.logger { }
 
 /** Path in the local filesystem to static assets containing the frontend */
 @ExperimentalPathApi
-val DASHBOARD_PATH: Path = Path(System.getenv("DASHBOARD_PATH")
-    ?: "dashboard".also { logger.warning("DASHBOARD_PATH not specified in environment; using default path (./dashboard)") })
+val DASHBOARD_PATH: Path = Path(
+    System.getenv("DASHBOARD_PATH")
+        ?: "dashboard".also { logger.warning("DASHBOARD_PATH not specified in environment; using default path (./dashboard)") }
+)
 
 @ExperimentalPathApi
 fun Application.module() {
@@ -53,6 +55,7 @@ fun Application.module() {
         }
 
         returnRecordings()
+        getRecordingAudio()
 
         get("/") {
             call.respondRedirect("/dashboard")

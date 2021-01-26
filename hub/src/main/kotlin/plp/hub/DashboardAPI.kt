@@ -3,12 +3,16 @@ package plp.hub
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
+import io.ktor.response.respondFile
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import plp.data.Transcript
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.div
+import kotlin.io.path.exists
 
 /**
  * A recording chunk, as expected by the dashboard
@@ -52,5 +56,25 @@ fun Route.returnRecordings() {
         val chunks = database.selectAfterTimestamp(cutoff).map(::transcriptToChunk)
 
         call.respond(chunks)
+    }
+}
+
+/** Route returning the contents of the specified audio file */
+@ExperimentalPathApi
+fun Route.getRecordingAudio() {
+    get("/audio/{filename}") {
+        val recordingFilename: String? = call.parameters["filename"]
+        if (recordingFilename == null) {
+            call.respond(HttpStatusCode.BadRequest, "missing filename in path")
+            return@get
+        }
+
+        val recordingPath = RecordingState.audioFileDirectory / recordingFilename
+        if (!recordingPath.exists()) {
+            call.respond(HttpStatusCode.NotFound, "$recordingFilename not found")
+            return@get
+        }
+
+        call.respondFile(RecordingState.audioFileDirectory.toFile(), recordingFilename)
     }
 }
