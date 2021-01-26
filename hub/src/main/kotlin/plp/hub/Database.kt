@@ -8,6 +8,7 @@ import plp.logging.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.div
+import kotlin.io.path.nameWithoutExtension
 
 private val logger = KotlinLogging.logger { }
 
@@ -23,6 +24,11 @@ fun initDatabase(dataPath: Path): Database {
     Database.Schema.create(driver)
 
     return database
+}
+
+@ExperimentalPathApi
+fun getTimestampFromRecording(recording: Recording): Int {
+    return recording.path.nameWithoutExtension.toInt()
 }
 
 /**
