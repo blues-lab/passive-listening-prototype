@@ -1,9 +1,0 @@
-CREATE TABLE IF NOT EXISTS audio(
-    id INTEGER PRIMARY KEY,
-    filename TEXT NOT NULL,
-    timestamp INTEGER NOT NULL,
-    duration REAL NOT NULL
-);
-
-insert:
-INSERT INTO audio VALUES (NULL, ?, ?, ?);
