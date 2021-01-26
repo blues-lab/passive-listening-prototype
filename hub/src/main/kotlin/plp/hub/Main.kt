@@ -6,7 +6,7 @@ import kotlinx.cli.required
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import plp.common.configureLogging
-import plp.common.rpc.MutualAuthInfo
+import plp.common.rpc.GrpcChannelChoice
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 
@@ -17,12 +17,12 @@ fun main(args: Array<String>) = runBlocking {
 
     val parser = ArgParser("Main")
     val dataDir by parser.option(ArgType.String).required()
-    val key by parser.option(ArgType.String).required()
-    val cert by parser.option(ArgType.String).required()
-    val root by parser.option(ArgType.String).required()
+    val root by parser.option(ArgType.String, description = "path to root certificate chain, if using TLS")
+    val key by parser.option(ArgType.String, description = "path to secret key file, if using mutual TLS")
+    val cert by parser.option(ArgType.String, description = "path to public certificate, if using mutual TLS")
     parser.parse(args)
 
-    val mutualAuthInfo = MutualAuthInfo(root = root, cert = cert, key = key)
+    val channel: GrpcChannelChoice = GrpcChannelChoice.fromArgs(root = root, cert = cert, key = key)
 
-    runRecordingHub(dataDirectory = Path(dataDir), mutualAuthInfo = mutualAuthInfo)
+    runRecordingHub(dataDirectory = Path(dataDir), channelChoice = channel)
 }

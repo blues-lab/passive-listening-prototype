@@ -3,8 +3,7 @@ package plp.hub
 import Transcription
 import TranscriptionServiceGrpcKt
 import com.google.protobuf.ByteString
-import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
-import plp.common.rpc.MutualAuthInfo
+import plp.common.rpc.GrpcChannelChoice
 import plp.logging.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -16,18 +15,15 @@ const val TRANSCRIPTION_SERVICE_PORT = plp.common.rpc.DEFAULT_PORT
 private val logger = KotlinLogging.logger {}
 
 @ExperimentalPathApi
-class MutualAuthTranscriptionClient(mutualAuthInfo: MutualAuthInfo) :
+open class TranscriptionClient(grpcChannelChoice: GrpcChannelChoice) :
     Transcriber {
-    private val stub: TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineStub
-
-    init {
-        val channel = NettyChannelBuilder.forAddress(TRANSCRIPTION_SERVICE_HOST, TRANSCRIPTION_SERVICE_PORT)
-            .useTransportSecurity()
-            .sslContext(mutualAuthInfo.sslContext)
-            .build()
-
-        stub = TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineStub(channel)
-    }
+    private val stub: TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineStub =
+        TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineStub(
+            grpcChannelChoice.makeChannel(
+                TRANSCRIPTION_SERVICE_HOST,
+                TRANSCRIPTION_SERVICE_PORT
+            )
+        )
 
     override suspend fun transcribeFile(file: Path): String {
         logger.debug { "requesting transcription of $file" }

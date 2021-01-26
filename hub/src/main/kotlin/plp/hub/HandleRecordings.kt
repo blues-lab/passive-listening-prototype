@@ -9,7 +9,7 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import plp.common.rpc.MutualAuthInfo
+import plp.common.rpc.GrpcChannelChoice
 import plp.data.Database
 import plp.logging.KotlinLogging
 import java.nio.file.Path
@@ -55,11 +55,11 @@ fun CoroutineScope.transcribeRecordings(
 
 @ExperimentalCoroutinesApi
 @ExperimentalPathApi
-fun launchRecordingPipeline(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo, state: RecordingState): Job {
+fun launchRecordingPipeline(dataDirectory: Path, channelChoice: GrpcChannelChoice, state: RecordingState): Job {
     val database = initDatabase(dataDirectory)
     state.database = database
     val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, DEFAULT_DURATION_SECONDS, dataDirectory)
-    val transcriber = MutualAuthTranscriptionClient(mutualAuthInfo)
+    val transcriber = TranscriptionClient(channelChoice)
 
     logger.debug { "launching recording job" }
     val recordingJob = GlobalScope.launch {
@@ -80,10 +80,10 @@ fun launchRecordingPipeline(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo,
 
 @ExperimentalCoroutinesApi
 @ExperimentalPathApi
-fun runRecordingHub(dataDirectory: Path, mutualAuthInfo: MutualAuthInfo) = runBlocking {
+fun runRecordingHub(dataDirectory: Path, channelChoice: GrpcChannelChoice) = runBlocking {
     val state = RecordingState
     state.audioFileDirectory = dataDirectory
-    val recordingJob = launchRecordingPipeline(dataDirectory, mutualAuthInfo, state)
+    val recordingJob = launchRecordingPipeline(dataDirectory, channelChoice, state)
 
     val server = startWebserver()
 
