@@ -3,6 +3,9 @@ package plp.logging
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/** The currently default log level. Anything below this level will not be printed. */
+val LOG_LEVEL = LogLevel.DEBUG
+
 /**
  * Given a closure, infer the file/class name from it.
  *
@@ -63,13 +66,14 @@ object KotlinLogging {
     }
 }
 
-enum class LogLevel { DEBUG, INFO, WARNING, ERROR }
+enum class LogLevel { TRACE, DEBUG, INFO, WARNING, ERROR }
 
 /**
  * Return the appropriate color for the given log level
  */
 fun colorForLevel(level: LogLevel): Color {
     return when (level) {
+        LogLevel.TRACE -> Color.WHITE
         LogLevel.DEBUG -> Color.CYAN
         LogLevel.INFO -> Color.GREEN
         LogLevel.WARNING -> Color.YELLOW
@@ -77,7 +81,16 @@ fun colorForLevel(level: LogLevel): Color {
     }
 }
 
+@Suppress("TooManyFunctions")
 class Logger(private val name: String) {
+    fun trace(msg: String?) {
+        trace { msg }
+    }
+
+    fun trace(msg: () -> Any?) {
+        log(LogLevel.TRACE, msg)
+    }
+
     fun debug(msg: String?) {
         debug { msg }
     }
@@ -111,6 +124,11 @@ class Logger(private val name: String) {
     }
 
     private fun log(level: LogLevel, msg: () -> Any?) {
+        // Don't output anything below the current log level
+        if (level < LOG_LEVEL) {
+            return
+        }
+
         val messageString = msg.invoke().toString()
         val color = colorForLevel(level)
         val statement = "$color${getCurrentTime()} - $name - $level - $messageString${Color.RESET}"
