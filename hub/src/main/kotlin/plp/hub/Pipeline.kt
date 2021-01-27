@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import plp.common.rpc.GrpcChannelChoice
 import plp.data.Database
+import plp.hub.classify.ClassificationClient
 import plp.hub.recording.DEFAULT_RECORDER
 import plp.hub.recording.MultiSegmentRecorder
 import plp.hub.recording.Recording
@@ -29,6 +30,9 @@ const val DEFAULT_DURATION_SECONDS = 5
 private val logger = KotlinLogging.logger { }
 
 open class RegisteredRecording(recording: Recording, val id: Long) : Recording(recording.path)
+
+open class TranscribedRecording(recording: RegisteredRecording, val transcription: String) :
+    RegisteredRecording(recording, recording.id)
 
 @ExperimentalPathApi
 @ExperimentalCoroutinesApi
@@ -52,8 +56,32 @@ fun CoroutineScope.transcribeRecordings(
         try {
             val text = transcriber.transcribeFile(recording.path)
             database.saveTranscript(recording, text)
+            send(TranscribedRecording(recording, text))
         } catch (err: io.grpc.StatusException) {
             logger.error("transcription failed: $err")
+            send(recording)
+        }
+    }
+}
+
+@ExperimentalPathApi
+@ExperimentalCoroutinesApi
+fun CoroutineScope.classifyRecordings(
+    database: Database,
+    classifier: ClassificationClient,
+    recordings: ReceiveChannel<RegisteredRecording>
+) = produce {
+    for (recording in recordings) {
+        logger.debug { "classifying recording $recording" }
+
+        if (recording is TranscribedRecording) {
+            try {
+                classifier.classifyRecording(recording)
+            } catch (err: io.grpc.StatusException) {
+                logger.error("classification failed: $err")
+            }
+        } else {
+            logger.debug { "recording hasn't been transcribed, skipping classification" }
         }
 
         send(recording)
@@ -67,15 +95,17 @@ fun launchRecordingPipeline(dataDirectory: Path, channelChoice: GrpcChannelChoic
     state.database = database
     val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, DEFAULT_DURATION_SECONDS, dataDirectory)
     val transcriber = TranscriptionClient(channelChoice)
+    val classifier = ClassificationClient(channelChoice)
 
     logger.debug { "launching recording job" }
     val recordingJob = GlobalScope.launch {
         val newRecordings = recordContinuously(recorder, state)
         val registeredRecordings = registerRecordings(database, newRecordings)
         val transcribedRecordings = transcribeRecordings(database, transcriber, registeredRecordings)
+        val classifiedRecordings = classifyRecordings(database, classifier, transcribedRecordings)
 
         var i = 0
-        transcribedRecordings.consumeEach { nextRecording ->
+        classifiedRecordings.consumeEach { nextRecording ->
             logger.debug("finished processing recording $i of current session: $nextRecording")
 
             i++
