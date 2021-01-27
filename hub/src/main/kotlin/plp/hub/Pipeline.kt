@@ -86,20 +86,15 @@ fun launchRecordingPipeline(dataDirectory: Path, channelChoice: GrpcChannelChoic
     return recordingJob
 }
 
-@ExperimentalCoroutinesApi
-@ExperimentalPathApi
-fun runRecordingHub(dataDirectory: Path, channelChoice: GrpcChannelChoice) = runBlocking {
-    val state = RecordingState
-    state.audioFileDirectory = dataDirectory
-    val recordingJob = launchRecordingPipeline(dataDirectory, channelChoice, state)
-
-    val server = startWebserver()
-
-    // Listen for user input to exit
+/**
+ * Toggle recording status based on STDIN input.
+ * Returns only after receiving EOF (CTRL-D).
+ */
+private fun blockForUserRecordingControl(state: RecordingState) {
     while (true) {
         println(
             "Recording is ${
-            state.status.toString().toLowerCase()
+                state.status.toString().toLowerCase()
             }. Type anything followed by Enter to toggle recording. Press CTRL-D to exit."
         )
         readLine() ?: break // break out of loop on EOF (CTRL-D)
@@ -119,6 +114,26 @@ fun runRecordingHub(dataDirectory: Path, channelChoice: GrpcChannelChoice) = run
             }
         }
     }
+}
+
+/**
+ * The hub's main method:
+ * - launches the recording pipeline
+ * - starts the web server
+ * - listens for STDIN input to control pipeline
+ * - cleans up before exiting
+ */
+@ExperimentalCoroutinesApi
+@ExperimentalPathApi
+fun runRecordingHub(dataDirectory: Path, channelChoice: GrpcChannelChoice) = runBlocking {
+    val state = RecordingState
+    state.audioFileDirectory = dataDirectory
+    val recordingJob = launchRecordingPipeline(dataDirectory, channelChoice, state)
+
+    val server = startWebserver()
+
+    // Control state based on user input
+    blockForUserRecordingControl(state)
 
     // Gracefully stop recording
     logger.info { "stopping recording job" }
@@ -134,5 +149,5 @@ fun runRecordingHub(dataDirectory: Path, channelChoice: GrpcChannelChoice) = run
     logger.info { "stopping web server" }
     server.stop(WEB_SERVICE_SHUTDOWN_TIMEOUT_MS, WEB_SERVICE_SHUTDOWN_TIMEOUT_MS)
 
-    logger.info("all done, exiting")
+    logger.info("recording pipeline is finished, exiting")
 }
