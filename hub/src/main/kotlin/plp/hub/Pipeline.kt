@@ -28,7 +28,7 @@ const val DEFAULT_DURATION_SECONDS = 5
 
 private val logger = KotlinLogging.logger { }
 
-data class RegisteredRecording(val recording: Recording, val id: Long)
+open class RegisteredRecording(recording: Recording, val id: Long) : Recording(recording.path)
 
 @ExperimentalPathApi
 @ExperimentalCoroutinesApi
@@ -46,18 +46,17 @@ fun CoroutineScope.transcribeRecordings(
     transcriber: Transcriber,
     records: ReceiveChannel<RegisteredRecording>
 ) = produce {
-    for (record in records) {
-        val recording = record.recording
+    for (recording in records) {
         logger.debug { "transcribing recording $recording" }
 
         try {
             val text = transcriber.transcribeFile(recording.path)
-            database.saveTranscript(record, text)
+            database.saveTranscript(recording, text)
         } catch (err: io.grpc.StatusException) {
             logger.error("transcription failed: $err")
         }
 
-        send(record)
+        send(recording)
     }
 }
 

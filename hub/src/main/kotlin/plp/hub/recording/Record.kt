@@ -46,7 +46,7 @@ fun recordNext(recorder: RecordOnce, durationSeconds: Int, containingDirectory: 
     return path
 }
 
-data class Recording(val path: Path)
+open class Recording(val path: Path)
 
 @ExperimentalPathApi
 class MultiSegmentRecorder(

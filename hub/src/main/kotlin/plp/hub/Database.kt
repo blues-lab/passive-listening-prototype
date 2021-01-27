@@ -64,8 +64,8 @@ fun Database.saveTranscript(recording: RegisteredRecording, text: String) {
 
     val queries = this.transcriptQueries
 
-    val filename = recording.recording.path.fileName.toString()
-    val timestamp = getTimestampFromRecording(recording.recording)
+    val filename = recording.path.fileName.toString()
+    val timestamp = getTimestampFromRecording(recording)
 
     queries.insert(
         recording.id,
