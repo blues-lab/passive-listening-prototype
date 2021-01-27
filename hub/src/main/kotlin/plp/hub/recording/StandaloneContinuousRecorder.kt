@@ -1,4 +1,4 @@
-package plp.hub
+package plp.hub.recording
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
@@ -6,6 +6,7 @@ import kotlinx.cli.required
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import plp.common.configureLogging
+import plp.hub.RecordingState
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 

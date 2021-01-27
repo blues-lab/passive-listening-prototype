@@ -1,6 +1,6 @@
 @file:Suppress("MagicNumber")
 
-package plp.hub
+package plp.hub.recording
 
 import plp.logging.KotlinLogging
 import javax.sound.sampled.AudioFileFormat

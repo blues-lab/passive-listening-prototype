@@ -1,4 +1,4 @@
-package plp.hub
+package plp.hub.recording
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType

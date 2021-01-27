@@ -6,7 +6,7 @@ import com.google.protobuf.ByteString
 import plp.common.TRANSCRIPTION_SERVICE_HOST
 import plp.common.TRANSCRIPTION_SERVICE_PORT
 import plp.common.rpc.GrpcChannelChoice
-import plp.hub.Recording
+import plp.hub.recording.Recording
 import plp.hub.getTimestampFromRecording
 import plp.logging.KotlinLogging
 import java.nio.file.Path
