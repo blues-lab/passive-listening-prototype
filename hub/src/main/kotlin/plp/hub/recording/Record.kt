@@ -77,11 +77,11 @@ fun CoroutineScope.recordContinuously(recorder: MultiSegmentRecorder, state: Rec
         logger.debug("recording continuously")
 
         while (true) {
-            logger.debug { "recording status is ${state.status}" }
+            logger.trace { "recording status is ${state.status}" }
             when (state.status) {
                 RecordingStatus.ACTIVE -> send(recorder.recordNext())
                 RecordingStatus.PAUSED -> {
-                    logger.debug { "sleeping for $SLEEP_INTERVAL_WHEN_RECORDING_IS_PAUSED ms because recording is paused" }
+                    logger.trace { "sleeping for $SLEEP_INTERVAL_WHEN_RECORDING_IS_PAUSED ms because recording is paused" }
                     delay(SLEEP_INTERVAL_WHEN_RECORDING_IS_PAUSED)
                 }
                 RecordingStatus.CANCELED -> break
