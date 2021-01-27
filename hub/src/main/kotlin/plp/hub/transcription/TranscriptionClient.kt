@@ -6,8 +6,8 @@ import com.google.protobuf.ByteString
 import plp.common.TRANSCRIPTION_SERVICE_HOST
 import plp.common.TRANSCRIPTION_SERVICE_PORT
 import plp.common.rpc.GrpcChannelChoice
-import plp.hub.recording.Recording
 import plp.hub.getTimestampFromRecording
+import plp.hub.recording.Recording
 import plp.logging.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -36,7 +36,7 @@ open class TranscriptionClient(grpcChannelChoice: GrpcChannelChoice) :
         val transcriptionRequest =
             Transcription.TranscriptionRequest.newBuilder().setAudio(fileContents).setId(fileId).build()
         val response = stub.transcribeFile(transcriptionRequest)
-        logger.debug { "received transcription response $response"}
+        logger.debug { "received transcription response $response" }
         return response.text
     }
 }

@@ -46,7 +46,17 @@ fun recordNext(recorder: RecordOnce, durationSeconds: Int, containingDirectory: 
     return path
 }
 
-open class Recording(val path: Path)
+/** A recording that has been made and saved to the filesystem */
+open class Recording(val path: Path) {
+    /** Return the recording's field valus, concatenated to a string */
+    open fun fieldsToString(): String {
+        return "path=$path"
+    }
+
+    override fun toString(): String {
+        return this::class.simpleName + "(" + fieldsToString() + ")"
+    }
+}
 
 @ExperimentalPathApi
 class MultiSegmentRecorder(

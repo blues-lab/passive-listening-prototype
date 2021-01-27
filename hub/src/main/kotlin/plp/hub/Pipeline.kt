@@ -29,10 +29,18 @@ const val DEFAULT_DURATION_SECONDS = 5
 
 private val logger = KotlinLogging.logger { }
 
-open class RegisteredRecording(recording: Recording, val id: Long) : Recording(recording.path)
+open class RegisteredRecording(recording: Recording, val id: Long) : Recording(recording.path) {
+    override fun fieldsToString(): String {
+        return super.fieldsToString() + ", id=$id"
+    }
+}
 
 open class TranscribedRecording(recording: RegisteredRecording, val transcription: String) :
-    RegisteredRecording(recording, recording.id)
+    RegisteredRecording(recording, recording.id) {
+    override fun fieldsToString(): String {
+        return super.fieldsToString() + ", transcription=$transcription"
+    }
+}
 
 @ExperimentalPathApi
 @ExperimentalCoroutinesApi
@@ -123,7 +131,7 @@ private fun blockForUserRecordingControl(state: RecordingState) {
     while (true) {
         println(
             "Recording is ${
-                state.status.toString().toLowerCase()
+            state.status.toString().toLowerCase()
             }. Type anything followed by Enter to toggle recording. Press CTRL-D to exit."
         )
         readLine() ?: break // break out of loop on EOF (CTRL-D)
