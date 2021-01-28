@@ -59,7 +59,7 @@ fun Database.registerRecording(recording: Recording): Long {
  * Save given transcription into the database
  */
 @ExperimentalPathApi
-fun Database.saveTranscript(recording: RegisteredRecording, text: String) {
+fun Database.saveTranscript(recording: RegisteredRecording, text: String): Long {
     logger.debug { "saving transcript for $recording to database" }
 
     val queries = this.transcriptQueries
@@ -73,7 +73,9 @@ fun Database.saveTranscript(recording: RegisteredRecording, text: String) {
         timestamp.toDouble(),
         DEFAULT_DURATION_SECONDS.toDouble(),
         text
-    ) // FIXME: use computed recording duration
+    ) // TODO: use computed recording duration
+
+    return queries.lastInsertRowId().executeAsOne()
 }
 
 fun Database.selectAfterTimestamp(cutoff: Int = 0): List<Transcript> {

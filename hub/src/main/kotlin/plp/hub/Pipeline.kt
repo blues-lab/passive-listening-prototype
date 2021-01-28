@@ -35,7 +35,7 @@ open class RegisteredRecording(recording: Recording, val id: Long) : Recording(r
     }
 }
 
-open class TranscribedRecording(recording: RegisteredRecording, val transcription: String) :
+open class TranscribedRecording(recording: RegisteredRecording, val transcription: String, val transcriptId: Long) :
     RegisteredRecording(recording, recording.id) {
     override fun fieldsToString(): String {
         return super.fieldsToString() + ", transcription=$transcription"
@@ -63,8 +63,8 @@ fun CoroutineScope.transcribeRecordings(
 
         try {
             val text = transcriber.transcribeFile(recording.path)
-            database.saveTranscript(recording, text)
-            send(TranscribedRecording(recording, text))
+            val transcriptId = database.saveTranscript(recording, text)
+            send(TranscribedRecording(recording, text, transcriptId))
         } catch (err: io.grpc.StatusException) {
             logger.error("transcription failed: $err")
             send(recording)
@@ -131,7 +131,7 @@ private fun blockForUserRecordingControl(state: RecordingState) {
     while (true) {
         println(
             "Recording is ${
-            state.status.toString().toLowerCase()
+                state.status.toString().toLowerCase()
             }. Type anything followed by Enter to toggle recording. Press CTRL-D to exit."
         )
         readLine() ?: break // break out of loop on EOF (CTRL-D)

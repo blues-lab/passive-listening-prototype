@@ -12,6 +12,9 @@ CREATE TABLE IF NOT EXISTS transcript(
 insert:
 INSERT INTO transcript VALUES (NULL, ?, ?, ?, ?, ?);
 
+lastInsertRowId:
+SELECT last_insert_rowid();
+
 select:
 SELECT * FROM transcript;
 
