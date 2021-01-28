@@ -18,7 +18,7 @@ private const val RECORDING_FILE_EXTENSION = ".wav"
 val DEFAULT_RECORDER = RecordJava
 
 /** How many recordings to buffer before pausing recording */
-const val RECORDING_CHANNEL_BUFFER_SIZE = 3
+const val RECORDING_CHANNEL_BUFFER_SIZE = 10
 
 /** When recording is paused, we'll sleep this long until checking whether we should resume */
 const val SLEEP_INTERVAL_WHEN_RECORDING_IS_PAUSED = 5000L
