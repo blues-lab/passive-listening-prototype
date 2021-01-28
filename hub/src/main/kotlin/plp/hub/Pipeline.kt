@@ -84,7 +84,8 @@ fun CoroutineScope.classifyRecordings(
 
         if (recording is TranscribedRecording) {
             try {
-                classifier.classifyRecording(recording)
+                val classification = classifier.classifyRecording(recording)
+                database.saveClassification(recording, classification)
             } catch (err: io.grpc.StatusException) {
                 logger.error("classification failed: $err")
             }
@@ -131,7 +132,7 @@ private fun blockForUserRecordingControl(state: RecordingState) {
     while (true) {
         println(
             "Recording is ${
-                state.status.toString().toLowerCase()
+            state.status.toString().toLowerCase()
             }. Type anything followed by Enter to toggle recording. Press CTRL-D to exit."
         )
         readLine() ?: break // break out of loop on EOF (CTRL-D)
@@ -176,7 +177,7 @@ fun runRecordingHub(dataDirectory: Path, channelChoice: GrpcChannelChoice) = run
     logger.info { "stopping recording job" }
     state.status = RecordingStatus.CANCELED
     recordingJob.join()
-    logger.info { "recording pipeline has been shut downt" }
+    logger.info { "recording pipeline has been shut down" }
 
     while (true) {
         println("Recording pipeline is shut down and won't start again. Server is still running. Press CTRL-D to stop it.")

@@ -21,11 +21,12 @@ class ClassificationClient(grpcChannelChoice: GrpcChannelChoice) {
             )
         )
 
-    suspend fun classifyRecording(recording: TranscribedRecording) {
+    suspend fun classifyRecording(recording: TranscribedRecording): Classification.ClassificationResponse {
         logger.debug { "requesting classification of $recording" }
         val request = Classification.ClassificationRequest.newBuilder().setId(recording.id.toInt())
             .setText(recording.transcription).build()
         val response = stub.classifyText(request)
         logger.debug { "classified $recording as $response" }
+        return response
     }
 }

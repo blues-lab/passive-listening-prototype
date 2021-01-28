@@ -6,6 +6,7 @@ import plp.data.Database
 import plp.data.Transcript
 import plp.hub.recording.Recording
 import plp.logging.KotlinLogging
+import plp.proto.Classification
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.div
@@ -82,4 +83,25 @@ fun Database.selectAfterTimestamp(cutoff: Int = 0): List<Transcript> {
     val queries = this.transcriptQueries
 
     return queries.selectAfterTimestamp(cutoff.toDouble()).executeAsList()
+}
+
+/**
+ * Save given classification into the database
+ */
+@ExperimentalPathApi
+fun Database.saveClassification(
+    recording: TranscribedRecording,
+    classification: Classification.ClassificationResponse
+) {
+    logger.debug { "saving classification of $recording to database" }
+
+    val queries = this.classificationQueries
+
+    queries.insert(
+        transcript_id = recording.transcriptId,
+        classifier = classification.classifierName,
+        classification = classification.classification,
+        confidence = classification.confidence.toDouble(),
+        extras = classification.extras,
+    )
 }

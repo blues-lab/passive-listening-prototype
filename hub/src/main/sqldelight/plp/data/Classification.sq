@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS classification(
+    id INTEGER PRIMARY KEY,
+    transcript_id INTEGER NOT NULL,
+    classifier TEXT NOT NULL,
+    classification TEXT NOT NULL,
+    confidence REAL NOT NULL,
+    extras TEXT,
+
+    FOREIGN KEY(transcript_id) REFERENCES transcript(id)
+);
+
+insert:
+INSERT INTO classification VALUES (NULL, ?, ?, ?, ?, ?);
