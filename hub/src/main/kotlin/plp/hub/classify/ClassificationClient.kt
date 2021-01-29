@@ -1,22 +1,20 @@
 package plp.hub.classify
 
-import plp.common.GLOBAL_CONFIG
+import plp.common.Service
 import plp.common.rpc.GrpcChannelChoice
 import plp.hub.TranscribedRecording
 import plp.logging.KotlinLogging
 import plp.proto.Classification
 import plp.proto.ClassificationServiceGrpcKt
-import kotlin.io.path.ExperimentalPathApi
 
 private val logger = KotlinLogging.logger {}
 
-@ExperimentalPathApi
-class ClassificationClient(grpcChannelChoice: GrpcChannelChoice) {
+class ClassificationClient(grpcChannelChoice: GrpcChannelChoice, service: Service) {
     private val stub: ClassificationServiceGrpcKt.ClassificationServiceCoroutineStub =
         ClassificationServiceGrpcKt.ClassificationServiceCoroutineStub(
             grpcChannelChoice.makeChannel(
-                GLOBAL_CONFIG.classificationServices[0].host,
-                GLOBAL_CONFIG.classificationServices[0].port,
+                service.host,
+                service.port,
             )
         )
 
@@ -29,3 +27,5 @@ class ClassificationClient(grpcChannelChoice: GrpcChannelChoice) {
         return response
     }
 }
+
+typealias ClassificationClientList = List<ClassificationClient>

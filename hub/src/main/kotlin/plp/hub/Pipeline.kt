@@ -4,14 +4,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import plp.common.GLOBAL_CONFIG
 import plp.common.rpc.GrpcChannelChoice
 import plp.data.Database
 import plp.hub.classify.ClassificationClient
+import plp.hub.classify.ClassificationClientList
 import plp.hub.recording.DEFAULT_RECORDER
 import plp.hub.recording.MultiSegmentRecorder
 import plp.hub.recording.Recording
@@ -76,18 +79,22 @@ fun CoroutineScope.transcribeRecordings(
 @ExperimentalCoroutinesApi
 fun CoroutineScope.classifyRecordings(
     database: Database,
-    classifier: ClassificationClient,
+    classifiers: ClassificationClientList,
     recordings: ReceiveChannel<RegisteredRecording>
 ) = produce {
     for (recording in recordings) {
         logger.debug { "classifying recording $recording" }
 
         if (recording is TranscribedRecording) {
-            try {
-                val classification = classifier.classifyRecording(recording)
-                database.saveClassification(recording, classification)
-            } catch (err: io.grpc.StatusException) {
-                logger.error("classification failed: $err")
+            classifiers.map { classifier ->
+                async {
+                    try {
+                        val classification = classifier.classifyRecording(recording)
+                        database.saveClassification(recording, classification)
+                    } catch (err: io.grpc.StatusException) {
+                        logger.error("classification failed: $err")
+                    }
+                }
             }
         } else {
             logger.debug { "recording hasn't been transcribed, skipping classification" }
@@ -104,14 +111,16 @@ fun launchRecordingPipeline(dataDirectory: Path, channelChoice: GrpcChannelChoic
     state.database = database
     val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, DEFAULT_DURATION_SECONDS, dataDirectory)
     val transcriber = TranscriptionClient(channelChoice)
-    val classifier = ClassificationClient(channelChoice)
+
+    val classifiers: ClassificationClientList =
+        GLOBAL_CONFIG.classificationServices.map { service -> ClassificationClient(channelChoice, service) }
 
     logger.debug { "launching recording job" }
     val recordingJob = GlobalScope.launch {
         val newRecordings = recordContinuously(recorder, state)
         val registeredRecordings = registerRecordings(database, newRecordings)
         val transcribedRecordings = transcribeRecordings(database, transcriber, registeredRecordings)
-        val classifiedRecordings = classifyRecordings(database, classifier, transcribedRecordings)
+        val classifiedRecordings = classifyRecordings(database, classifiers, transcribedRecordings)
 
         var i = 0
         classifiedRecordings.consumeEach { nextRecording ->
