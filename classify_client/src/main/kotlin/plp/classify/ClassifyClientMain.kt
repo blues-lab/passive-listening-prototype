@@ -4,6 +4,7 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import plp.common.GLOBAL_CONFIG
 import plp.common.rpc.GrpcChannelChoice
 import kotlin.io.path.ExperimentalPathApi
 
@@ -22,16 +23,16 @@ fun main(args: Array<String>) = runBlocking {
     parser.parse(args)
 
     val channel: GrpcChannelChoice = GrpcChannelChoice.fromArgs(root = root, cert = cert, key = key)
-    val client = ClassificationClient(channel)
+    val clients = GLOBAL_CONFIG.classificationServices.map { service -> ClassificationClient(channel, service) }
 
     if (text != null) {
-        client.classifyText(text!!)
+        clients.classify(text!!)
     } else {
         while (true) {
             println("Enter text you want to classify, or CTRL-D to exit.")
             val nextText = readLine() ?: break
 
-            client.classifyText(nextText)
+            clients.classify(nextText)
         }
     }
 }
