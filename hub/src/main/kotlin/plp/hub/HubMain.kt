@@ -5,6 +5,7 @@ import kotlinx.cli.ArgType
 import kotlinx.cli.required
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import plp.common.CONFIG_FILENAME
 import plp.common.configureLogging
 import plp.common.rpc.GrpcChannelChoice
 import kotlin.io.path.ExperimentalPathApi
@@ -20,7 +21,12 @@ fun main(args: Array<String>) = runBlocking {
     val root by parser.option(ArgType.String, description = "path to root certificate chain, if using TLS")
     val key by parser.option(ArgType.String, description = "path to secret key file, if using mutual TLS")
     val cert by parser.option(ArgType.String, description = "path to public certificate, if using mutual TLS")
+    val config by parser.option(ArgType.String, description = "path to config file (overrides default)")
     parser.parse(args)
+
+    if (config != null) {
+        CONFIG_FILENAME = config!!
+    }
 
     val channel: GrpcChannelChoice = GrpcChannelChoice.fromArgs(root = root, cert = cert, key = key)
 

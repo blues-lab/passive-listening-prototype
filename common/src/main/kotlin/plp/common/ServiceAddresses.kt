@@ -1,7 +1,0 @@
-package plp.common
-
-const val TRANSCRIPTION_SERVICE_HOST = "localhost"
-const val TRANSCRIPTION_SERVICE_PORT = 50057
-
-const val SAMPLE_CLASSIFICATION_SERVICE_HOST = "localhost"
-const val SAMPLE_CLASSIFICATION_SERVICE_PORT = 50060

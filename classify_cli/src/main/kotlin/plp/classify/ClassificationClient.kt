@@ -1,7 +1,6 @@
 package plp.classify
 
-import plp.common.SAMPLE_CLASSIFICATION_SERVICE_HOST
-import plp.common.SAMPLE_CLASSIFICATION_SERVICE_PORT
+import plp.common.GLOBAL_CONFIG
 import plp.common.currentUnixTime
 import plp.common.rpc.GrpcChannelChoice
 import plp.logging.KotlinLogging
@@ -16,8 +15,8 @@ open class ClassificationClient(grpcChannelChoice: GrpcChannelChoice) {
     private val stub: ClassificationServiceGrpcKt.ClassificationServiceCoroutineStub =
         ClassificationServiceGrpcKt.ClassificationServiceCoroutineStub(
             grpcChannelChoice.makeChannel(
-                SAMPLE_CLASSIFICATION_SERVICE_HOST,
-                SAMPLE_CLASSIFICATION_SERVICE_PORT
+                GLOBAL_CONFIG.classificationServices[0].host,
+                GLOBAL_CONFIG.classificationServices[0].port,
             )
         )
 

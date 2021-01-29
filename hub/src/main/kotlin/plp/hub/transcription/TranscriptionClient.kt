@@ -3,8 +3,7 @@ package plp.hub.transcription
 import Transcription
 import TranscriptionServiceGrpcKt
 import com.google.protobuf.ByteString
-import plp.common.TRANSCRIPTION_SERVICE_HOST
-import plp.common.TRANSCRIPTION_SERVICE_PORT
+import plp.common.GLOBAL_CONFIG
 import plp.common.rpc.GrpcChannelChoice
 import plp.hub.getTimestampFromRecording
 import plp.hub.recording.Recording
@@ -21,8 +20,8 @@ open class TranscriptionClient(grpcChannelChoice: GrpcChannelChoice) :
     private val stub: TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineStub =
         TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineStub(
             grpcChannelChoice.makeChannel(
-                TRANSCRIPTION_SERVICE_HOST,
-                TRANSCRIPTION_SERVICE_PORT
+                GLOBAL_CONFIG.transcriptionService.host,
+                GLOBAL_CONFIG.transcriptionService.port,
             )
         )
 
