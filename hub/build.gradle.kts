@@ -17,8 +17,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
     implementation("com.squareup.sqldelight:sqlite-driver:1.4.4")
-    implementation("io.ktor:ktor-server-netty:1.5.0")
-    implementation("io.ktor:ktor-serialization:1.5.0")
+    implementation("io.ktor:ktor-server-netty:1.5.1")
+    implementation("io.ktor:ktor-serialization:1.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 }
 
