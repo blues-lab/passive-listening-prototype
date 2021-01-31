@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
 import plp.common.currentUnixTime
 import plp.hub.RecordingState
 import plp.hub.RecordingStatus
@@ -90,10 +89,3 @@ fun CoroutineScope.recordContinuously(recorder: MultiSegmentRecorder, state: Rec
 
         logger.info { "recording state is ${RecordingStatus.CANCELED}, returning" }
     }
-
-@ExperimentalPathApi
-fun recordingFlow(recorder: MultiSegmentRecorder) = flow {
-    while (true) {
-        emit(recorder.recordNext())
-    }
-}
