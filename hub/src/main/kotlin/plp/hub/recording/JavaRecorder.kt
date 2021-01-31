@@ -59,7 +59,7 @@ class AudioRecorder(
         line!!.start()
         val stream = AudioInputStream(line)
 
-        logger.debug { "starting recording" }
+        logger.debug { "starting recording $outputPath" }
         AudioSystem.write(stream, fileType, outputPath.toFile())
     }
 
@@ -69,7 +69,7 @@ class AudioRecorder(
     fun stop() {
         line!!.stop()
         line!!.close()
-        logger.debug("stopped recording")
+        logger.debug { "stopped recording $outputPath" }
     }
 }
 
