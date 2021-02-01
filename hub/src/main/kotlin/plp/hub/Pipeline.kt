@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
@@ -46,11 +45,34 @@ open class TranscribedRecording(recording: RegisteredRecording, val transcriptio
 }
 
 @ExperimentalPathApi
+fun registerRecording(database: Database, recording: Recording): RegisteredRecording {
+    val id = database.registerRecording(recording)
+    return RegisteredRecording(recording, id)
+}
+
+@ExperimentalPathApi
 @ExperimentalCoroutinesApi
 fun CoroutineScope.registerRecordings(database: Database, recordings: ReceiveChannel<Recording>) = produce {
     for (recording in recordings) {
-        val id = database.registerRecording(recording)
-        send(RegisteredRecording(recording, id))
+        send(registerRecording(database, recording))
+    }
+}
+
+@ExperimentalPathApi
+suspend fun transcribeRecording(
+    database: Database,
+    transcriber: Transcriber,
+    recording: RegisteredRecording,
+): RegisteredRecording {
+    logger.debug { "transcribing recording $recording" }
+
+    return try {
+        val text = transcriber.transcribeFile(recording.path)
+        val transcriptId = database.saveTranscript(recording, text)
+        TranscribedRecording(recording, text, transcriptId)
+    } catch (err: io.grpc.StatusException) {
+        logger.error("transcription failed: $err")
+        recording
     }
 }
 
@@ -62,17 +84,34 @@ fun CoroutineScope.transcribeRecordings(
     records: ReceiveChannel<RegisteredRecording>
 ) = produce {
     for (recording in records) {
-        logger.debug { "transcribing recording $recording" }
-
-        try {
-            val text = transcriber.transcribeFile(recording.path)
-            val transcriptId = database.saveTranscript(recording, text)
-            send(TranscribedRecording(recording, text, transcriptId))
-        } catch (err: io.grpc.StatusException) {
-            logger.error("transcription failed: $err")
-            send(recording)
-        }
+        send(transcribeRecording(database, transcriber, recording))
     }
+}
+
+@ExperimentalPathApi
+fun CoroutineScope.classifyRecording(
+    database: Database,
+    classifiers: ClassificationClientList,
+    recording: RegisteredRecording
+): RegisteredRecording {
+    logger.debug { "classifying recording $recording" }
+
+    if (recording is TranscribedRecording) {
+        classifiers.map { classifier ->
+            launch {
+                try {
+                    val classification = classifier.classifyRecording(recording)
+                    database.saveClassification(recording, classification)
+                } catch (err: io.grpc.StatusException) {
+                    logger.error("classification failed: $err")
+                }
+            }
+        }
+    } else {
+        logger.debug { "recording hasn't been transcribed, skipping classification" }
+    }
+
+    return recording
 }
 
 @ExperimentalPathApi
@@ -83,24 +122,7 @@ fun CoroutineScope.classifyRecordings(
     recordings: ReceiveChannel<RegisteredRecording>
 ) = produce {
     for (recording in recordings) {
-        logger.debug { "classifying recording $recording" }
-
-        if (recording is TranscribedRecording) {
-            classifiers.map { classifier ->
-                async {
-                    try {
-                        val classification = classifier.classifyRecording(recording)
-                        database.saveClassification(recording, classification)
-                    } catch (err: io.grpc.StatusException) {
-                        logger.error("classification failed: $err")
-                    }
-                }
-            }
-        } else {
-            logger.debug { "recording hasn't been transcribed, skipping classification" }
-        }
-
-        send(recording)
+        send(classifyRecording(database, classifiers, recording))
     }
 }
 
