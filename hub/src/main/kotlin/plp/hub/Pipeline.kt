@@ -4,9 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import plp.common.GLOBAL_CONFIG
@@ -51,14 +48,6 @@ fun registerRecording(database: Database, recording: Recording): RegisteredRecor
 }
 
 @ExperimentalPathApi
-@ExperimentalCoroutinesApi
-fun CoroutineScope.registerRecordings(database: Database, recordings: ReceiveChannel<Recording>) = produce {
-    for (recording in recordings) {
-        send(registerRecording(database, recording))
-    }
-}
-
-@ExperimentalPathApi
 suspend fun transcribeRecording(
     database: Database,
     transcriber: Transcriber,
@@ -73,18 +62,6 @@ suspend fun transcribeRecording(
     } catch (err: io.grpc.StatusException) {
         logger.error("transcription failed: $err")
         recording
-    }
-}
-
-@ExperimentalPathApi
-@ExperimentalCoroutinesApi
-fun CoroutineScope.transcribeRecordings(
-    database: Database,
-    transcriber: Transcriber,
-    records: ReceiveChannel<RegisteredRecording>
-) = produce {
-    for (recording in records) {
-        send(transcribeRecording(database, transcriber, recording))
     }
 }
 
@@ -115,15 +92,16 @@ fun CoroutineScope.classifyRecording(
 }
 
 @ExperimentalPathApi
-@ExperimentalCoroutinesApi
-fun CoroutineScope.classifyRecordings(
+fun CoroutineScope.launchJobToHandleRecording(
     database: Database,
+    transcriber: Transcriber,
     classifiers: ClassificationClientList,
-    recordings: ReceiveChannel<RegisteredRecording>
-) = produce {
-    for (recording in recordings) {
-        send(classifyRecording(database, classifiers, recording))
-    }
+    newRecording: Recording
+) = launch {
+    logger.trace { "inside the new coroutine job to handle pipeline for recording $newRecording" }
+    var recording = registerRecording(database, newRecording)
+    recording = transcribeRecording(database, transcriber, recording)
+    classifyRecording(database, classifiers, recording)
 }
 
 @ExperimentalCoroutinesApi
@@ -137,21 +115,27 @@ fun launchRecordingPipeline(dataDirectory: Path, channelChoice: GrpcChannelChoic
     val classifiers: ClassificationClientList =
         GLOBAL_CONFIG.classificationServices.map { service -> ClassificationClient(channelChoice, service) }
 
-    logger.debug { "launching recording job" }
+    logger.trace { "launching recording pipeline in a new job" }
     val recordingJob = GlobalScope.launch {
+        logger.debug { "started the new recording pipeline job" }
+
         val newRecordings = recordContinuously(recorder, state)
-        val registeredRecordings = registerRecordings(database, newRecordings)
-        val transcribedRecordings = transcribeRecordings(database, transcriber, registeredRecordings)
-        val classifiedRecordings = classifyRecordings(database, classifiers, transcribedRecordings)
-
         var i = 0
-        classifiedRecordings.consumeEach { nextRecording ->
-            logger.debug("finished processing recording $i of current session: $nextRecording")
 
-            i++
+        for (newRecording in newRecordings) {
+            logger.trace { "received new recording $newRecording in main recording pipeline job. launching new job to handle it. " }
+
+            launchJobToHandleRecording(database, transcriber, classifiers, newRecording).invokeOnCompletion {
+                logger.debug("finished processing recording $i of current session: $newRecording")
+                i++
+            }
+
+            logger.trace { "done launching coroutine for handling recording $newRecording" }
         }
     }
-    logger.debug { "recording job is now running in the background" }
+
+    logger.trace { "done launching new recording pipeline job" }
+
     return recordingJob
 }
 
