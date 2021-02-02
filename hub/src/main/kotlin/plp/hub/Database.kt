@@ -5,6 +5,7 @@ import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import plp.data.Database
 import plp.data.Transcript
 import plp.hub.recording.Recording
+import plp.hub.transcription.TranscribedRecording
 import plp.logging.KotlinLogging
 import plp.proto.Classification
 import java.nio.file.Path

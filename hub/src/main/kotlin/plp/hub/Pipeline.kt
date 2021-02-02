@@ -15,6 +15,7 @@ import plp.hub.recording.DEFAULT_RECORDER
 import plp.hub.recording.MultiSegmentRecorder
 import plp.hub.recording.Recording
 import plp.hub.recording.recordContinuously
+import plp.hub.transcription.TranscribedRecording
 import plp.hub.transcription.Transcriber
 import plp.hub.transcription.TranscriptionClient
 import plp.hub.web.WEB_SERVICE_SHUTDOWN_TIMEOUT_MS
@@ -27,25 +28,6 @@ import kotlin.io.path.ExperimentalPathApi
 const val DEFAULT_DURATION_SECONDS = 5
 
 private val logger = KotlinLogging.logger { }
-
-open class RegisteredRecording(recording: Recording, val id: Long) : Recording(recording.path) {
-    override fun fieldsToString(): String {
-        return super.fieldsToString() + ", id=$id"
-    }
-}
-
-open class TranscribedRecording(recording: RegisteredRecording, val transcription: String, val transcriptId: Long) :
-    RegisteredRecording(recording, recording.id) {
-
-    /**
-     * This boolean represents whether this recording's transcription has any usable text.
-     */
-    val usableTranscription = transcription != ""
-
-    override fun fieldsToString(): String {
-        return super.fieldsToString() + ", transcription=$transcription"
-    }
-}
 
 @ExperimentalPathApi
 fun registerRecording(database: Database, recording: Recording): RegisteredRecording {

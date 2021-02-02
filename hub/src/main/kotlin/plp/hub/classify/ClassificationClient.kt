@@ -2,7 +2,7 @@ package plp.hub.classify
 
 import plp.common.Service
 import plp.common.rpc.client.GrpcChannelChoice
-import plp.hub.TranscribedRecording
+import plp.hub.transcription.TranscribedRecording
 import plp.logging.KotlinLogging
 import plp.proto.Classification
 import plp.proto.ClassificationServiceGrpcKt
