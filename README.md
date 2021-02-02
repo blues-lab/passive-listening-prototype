@@ -30,11 +30,15 @@ This should be sufficient if you're running the code using the helper script.
 
 ## Running
 
-To run the current version, you'll need to launch an instance of (1) the hub and (2) the transcription service, from their respective directories.
+To run the current version, you'll need to launch the following:
+
+1. an instance of the hub, from the `hub` directory
+2. an instance of the transcription service, from the `transcribe` directory
+3. an instance of the Voice Activity Detection service, from the `vad_service` repo. Note that it's written in Python and is launched differently from the other services.
+4. a classifier (or several). These are in a separate repo.
 
 For any of the services, there are 3 ways of running them:
 
 1. `./gradlew run` builds and runs the code in one command. You'll need to specify the CLI args like `./gradlew run --args "--some-flag"`
 2. `./gradlew installDist` then (from the project subdirectory) `./build/install/<project>/bin/<project> --some-flag`
 3. `./gradlew shadowJar` then (from the project subdirectory) `java -jar ./build/libs/<project>-all.jar --some-flag`. This JAR can also be copied to other systems.
-
