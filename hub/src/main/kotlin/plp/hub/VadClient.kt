@@ -4,7 +4,7 @@ import Vad
 import VadServiceGrpcKt
 import com.google.protobuf.ByteString
 import plp.common.GLOBAL_CONFIG
-import plp.common.rpc.GrpcChannelChoice
+import plp.common.rpc.client.GrpcChannelChoice
 import plp.logging.KotlinLogging
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.inputStream

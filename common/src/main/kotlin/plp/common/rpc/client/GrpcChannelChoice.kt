@@ -1,4 +1,4 @@
-package plp.common.rpc
+package plp.common.rpc.client
 
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
@@ -41,9 +41,11 @@ sealed class GrpcChannelChoice {
     }
 }
 
-data class MutualAuthChannel(val root: String, val cert: String, val key: String) : GrpcChannelChoice() {
+class MutualAuthChannel(private val root: String, private val cert: String, private val key: String) : GrpcChannelChoice() {
     @ExperimentalPathApi
     override fun makeChannel(host: String, port: Int): ManagedChannel {
+        logger.debug { "creating a mutual TLS channel to $host:$port" }
+
         val sslContext: SslContext = GrpcSslContexts.forClient()
             .trustManager(this.root.toPath().toFile())
             .keyManager(this.cert.toPath().toFile(), this.key.toPath().toFile())
@@ -56,9 +58,11 @@ data class MutualAuthChannel(val root: String, val cert: String, val key: String
     }
 }
 
-data class TlsChannel(val root: String) : GrpcChannelChoice() {
+class TlsChannel(private val root: String) : GrpcChannelChoice() {
     @ExperimentalPathApi
     override fun makeChannel(host: String, port: Int): ManagedChannel {
+        logger.debug { "creating a TLS channel to $host:$port" }
+
         val sslContext: SslContext = GrpcSslContexts.forClient()
             .trustManager(this.root.toPath().toFile())
             .build()
@@ -73,6 +77,8 @@ data class TlsChannel(val root: String) : GrpcChannelChoice() {
 object InsecureChannel : GrpcChannelChoice() {
     @ExperimentalPathApi
     override fun makeChannel(host: String, port: Int): ManagedChannel {
+        logger.debug { "creating an insecure channel to $host:$port" }
+
         return ManagedChannelBuilder.forAddress(host, port).usePlaintext().build()
     }
 }

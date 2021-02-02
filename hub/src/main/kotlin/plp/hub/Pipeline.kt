@@ -7,7 +7,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import plp.common.GLOBAL_CONFIG
-import plp.common.rpc.GrpcChannelChoice
+import plp.common.rpc.client.GrpcChannelChoice
 import plp.data.Database
 import plp.hub.classify.ClassificationClient
 import plp.hub.classify.ClassificationClientList

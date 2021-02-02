@@ -5,7 +5,7 @@ import kotlinx.cli.ArgType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import plp.common.GLOBAL_CONFIG
-import plp.common.rpc.GrpcChannelChoice
+import plp.common.rpc.client.GrpcChannelChoice
 import kotlin.io.path.ExperimentalPathApi
 
 @ExperimentalCoroutinesApi

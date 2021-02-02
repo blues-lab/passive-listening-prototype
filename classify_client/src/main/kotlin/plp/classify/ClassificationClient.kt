@@ -2,7 +2,7 @@ package plp.classify
 
 import plp.common.Service
 import plp.common.currentUnixTime
-import plp.common.rpc.GrpcChannelChoice
+import plp.common.rpc.client.GrpcChannelChoice
 import plp.logging.KotlinLogging
 import plp.proto.Classification
 import plp.proto.ClassificationServiceGrpcKt
