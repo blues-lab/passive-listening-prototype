@@ -12,13 +12,11 @@ private val logger = KotlinLogging.logger {}
 /**
  * Transcribe given audio
  *
- * @param modelPath path to wav2letter's model files
+ * @param transcriber transcription implementation to use for transcription
  * @param tmpDir location for temporary files. Can't use the system default because tmpfs isn't mounted correctly into Docker containers, producing empty transcriptions
  */
-class TranscriptionService(private val modelPath: NioFilePath, private val tmpDir: NioFilePath) :
+class TranscriptionService(private val transcriber: Transcriber, private val tmpDir: NioFilePath) :
     TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineImplBase() {
-
-    private val transcriber = Wav2letterTranscriber(modelPath)
 
     @ExperimentalPathApi
     @Suppress("TooGenericExceptionCaught")

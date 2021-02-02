@@ -2,6 +2,7 @@ package plp.transcribe
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
+import kotlinx.cli.default
 import kotlinx.cli.required
 import plp.common.CONFIG_FILENAME
 import plp.common.GLOBAL_CONFIG
@@ -21,11 +22,16 @@ fun main(args: Array<String>) {
         ArgType.String,
         description = "the directory containing the wav2letter model. If omitted, server will respond with fake transcriptions instead of actually invoking the transcription process"
     )
-    val tmpDir by parser.option(ArgType.String, description = "path for storing files being transcribed").required()
+    val tmpDir by parser.option(ArgType.String, description = "path for temporarily storing files being transcribed").required()
     val root by parser.option(ArgType.String, description = "path to root certificate chain, if using mutual TLS")
     val key by parser.option(ArgType.String, description = "path to secret key file, if using TLS")
     val cert by parser.option(ArgType.String, description = "path to public certificate, if using TLS")
     val config by parser.option(ArgType.String, description = "path to config file (overrides default)")
+    val parallel by parser.option(
+        ArgType.Int,
+        shortName = "p",
+        description = "maximum number of Docker containers to launch in parallel"
+    ).default(1)
     parser.parse(args)
 
     if (config != null) {
@@ -35,15 +41,16 @@ fun main(args: Array<String>) {
     val logger = KotlinLogging.logger {}
     logger.info("starting Transcription server")
 
-    val service = if (model == null) {
+    val transcriber: Transcriber = if (model == null) {
         logger.error("missing argument: `model` (wav2letter model path). Server will respond with fake transcriptions instead of actually invoking the transcription process")
-        FakeTranscriptionService()
+        FakeTranscriber()
     } else {
-        TranscriptionService(
+        Wav2letterTranscriber(
             Path(resolveHomeDirectory(model!!)),
-            Path(resolveHomeDirectory(tmpDir))
+            parallel
         )
     }
+    val service = TranscriptionService(transcriber, Path(resolveHomeDirectory(tmpDir)))
 
     val server = GrpcServer.fromArgs(
         service,

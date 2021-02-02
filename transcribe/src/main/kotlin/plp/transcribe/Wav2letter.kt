@@ -14,13 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger
 
 private val logger = KotlinLogging.logger {}
 
-/**
- * Maximum number of wav2letter jobs to allow concurrently
- * NOTE: you must use the Wav2letterTranscriber class for this to be respected
- * @see Wav2letterTranscriber
- */
-const val MAX_JOB_COUNT = 1
-
 /** Number of wav2letter jobs that have been launched */
 val totalJobCount = AtomicInteger(0)
 
@@ -101,8 +94,16 @@ fun filterTranscribedSilence(transcript: String): String {
     }
 }
 
-class Wav2letterTranscriber(private val modelDir: Path) : Transcriber {
-    private val semaphore = Semaphore(MAX_JOB_COUNT)
+/**
+ * @param modelDir path to directory that contains wav2letter model files. It will be mapped into the Docker container.
+ * @param maxParallelJobs Maximum number of wav2letter jobs to allow concurrently
+ */
+class Wav2letterTranscriber(
+    private val modelDir: Path,
+    maxParallelJobs: Int = 1
+) : Transcriber {
+
+    private val semaphore = Semaphore(maxParallelJobs)
 
     override suspend fun transcribeFile(file: Path): String {
         logger.trace { "will start transcription, as soon as semaphore allows" }
