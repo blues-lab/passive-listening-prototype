@@ -40,7 +40,7 @@ open class TranscribedRecording(recording: RegisteredRecording, val transcriptio
     /**
      * This boolean represents whether this recording's transcription has any usable text.
      */
-    val usableTranscription = transcription == ""
+    val usableTranscription = transcription != ""
 
     override fun fieldsToString(): String {
         return super.fieldsToString() + ", transcription=$transcription"
