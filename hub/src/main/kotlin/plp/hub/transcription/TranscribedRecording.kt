@@ -1,6 +1,6 @@
 package plp.hub.transcription
 
-import plp.hub.RegisteredRecording
+import plp.hub.database.RegisteredRecording
 
 open class TranscribedRecording(recording: RegisteredRecording, val transcription: String, val transcriptId: Long) :
     RegisteredRecording(recording, recording.id) {

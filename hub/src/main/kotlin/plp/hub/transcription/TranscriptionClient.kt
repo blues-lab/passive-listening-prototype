@@ -5,7 +5,7 @@ import TranscriptionServiceGrpcKt
 import com.google.protobuf.ByteString
 import plp.common.GLOBAL_CONFIG
 import plp.common.rpc.client.GrpcChannelChoice
-import plp.hub.getTimestampFromRecording
+import plp.hub.database.getTimestampFromRecording
 import plp.hub.recording.Recording
 import plp.logging.KotlinLogging
 import java.nio.file.Path

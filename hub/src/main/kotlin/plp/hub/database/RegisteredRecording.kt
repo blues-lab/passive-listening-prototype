@@ -1,4 +1,4 @@
-package plp.hub
+package plp.hub.database
 
 import plp.hub.recording.Recording
 

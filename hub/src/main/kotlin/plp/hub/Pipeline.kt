@@ -11,6 +11,11 @@ import plp.common.rpc.client.GrpcChannelChoice
 import plp.data.Database
 import plp.hub.classify.ClassificationClient
 import plp.hub.classify.ClassificationClientList
+import plp.hub.database.RegisteredRecording
+import plp.hub.database.initDatabase
+import plp.hub.database.registerRecording
+import plp.hub.database.saveClassification
+import plp.hub.database.saveTranscript
 import plp.hub.recording.DEFAULT_RECORDER
 import plp.hub.recording.MultiSegmentRecorder
 import plp.hub.recording.Recording
@@ -18,6 +23,7 @@ import plp.hub.recording.recordContinuously
 import plp.hub.transcription.TranscribedRecording
 import plp.hub.transcription.Transcriber
 import plp.hub.transcription.TranscriptionClient
+import plp.hub.vad.VadClient
 import plp.hub.web.WEB_SERVICE_SHUTDOWN_TIMEOUT_MS
 import plp.hub.web.startWebserver
 import plp.logging.KotlinLogging

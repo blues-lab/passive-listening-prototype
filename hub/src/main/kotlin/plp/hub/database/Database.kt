@@ -1,9 +1,10 @@
-package plp.hub
+package plp.hub.database
 
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import plp.data.Database
 import plp.data.Transcript
+import plp.hub.DEFAULT_DURATION_SECONDS
 import plp.hub.recording.Recording
 import plp.hub.transcription.TranscribedRecording
 import plp.logging.KotlinLogging
