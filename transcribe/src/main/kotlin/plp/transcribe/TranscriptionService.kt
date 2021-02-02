@@ -17,6 +17,9 @@ private val logger = KotlinLogging.logger {}
  */
 class TranscriptionService(private val modelPath: NioFilePath, private val tmpDir: NioFilePath) :
     TranscriptionServiceGrpcKt.TranscriptionServiceCoroutineImplBase() {
+
+    private val transcriber = Wav2letterTranscriber(modelPath)
+
     @ExperimentalPathApi
     @Suppress("TooGenericExceptionCaught")
     override suspend fun transcribeFile(request: Transcription.TranscriptionRequest): Transcription.TranscriptionResponse {
@@ -27,7 +30,7 @@ class TranscriptionService(private val modelPath: NioFilePath, private val tmpDi
             logger.debug { "storing request ${request.id} bytes in $tempFile" }
             tempFile.writeBytes(request.audio.toByteArray())
 
-            val text = transcribeFile(tempFile.toFile(), modelPath.toFile())
+            val text = transcriber.transcribeFile(tempFile)
 
             logger.debug { "cleaning up $tempFile now that transcription is done" }
             tempFile.deleteExisting()
