@@ -1,5 +1,7 @@
 package plp.transcribe
 
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import plp.common.runCommandAndGetOutput
 import plp.logging.KotlinLogging
 import java.io.File
@@ -11,6 +13,13 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 
 private val logger = KotlinLogging.logger {}
+
+/**
+ * Maximum number of wav2letter jobs to allow concurrently
+ * NOTE: you must use the Wav2letterTranscriber class for this to be respected
+ * @see Wav2letterTranscriber
+ */
+const val MAX_JOB_COUNT = 1
 
 /** Number of wav2letter jobs that have been launched */
 val totalJobCount = AtomicInteger(0)
@@ -74,7 +83,13 @@ fun transcribeFile(fileToTranscribe: File, modelDir: File): String {
 }
 
 class Wav2letterTranscriber(private val modelDir: Path) : Transcriber {
-    override fun transcribeFile(file: Path): String {
-        return transcribeFile(file.toFile(), modelDir.toFile())
+    private val semaphore = Semaphore(MAX_JOB_COUNT)
+
+    override suspend fun transcribeFile(file: Path): String {
+        logger.info { "will start transcription, as soon as semaphore allows "}
+        semaphore.withPermit { // ensures that only MAX_JOB_COUNT jobs are happening at once
+            logger.info { "semaphore allowed, starting transcription"}
+            return transcribeFile(file.toFile(), modelDir.toFile())
+        }
     }
 }

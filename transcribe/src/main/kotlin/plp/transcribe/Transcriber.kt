@@ -2,6 +2,6 @@ package plp.transcribe
 
 import java.nio.file.Path
 
-fun interface Transcriber {
-    fun transcribeFile(file: Path): String
+interface Transcriber {
+    suspend fun transcribeFile(file: Path): String
 }
