@@ -74,7 +74,7 @@ fun Application.module() {
                 RecordingStatus.ACTIVE -> {
                     call.respondText("No change") // TODO: provide standardized JSON response
                 }
-                RecordingStatus.PAUSED -> {
+                RecordingStatus.PAUSING, RecordingStatus.PAUSED, RecordingStatus.CANCELING -> {
                     RecordingState.status = RecordingStatus.ACTIVE
                     call.respondText("OK")
                 }
@@ -89,13 +89,13 @@ fun Application.module() {
             logger.debug { "received start request; current status is ${RecordingState.status}" }
             when (RecordingState.status) {
                 RecordingStatus.ACTIVE -> {
-                    RecordingState.status = RecordingStatus.PAUSED
+                    RecordingState.status = RecordingStatus.PAUSING
                     call.respondText("OK")
                 }
-                RecordingStatus.PAUSED -> {
+                RecordingStatus.PAUSING, RecordingStatus.PAUSED -> {
                     call.respondText("No change") // TODO: provide standardized JSON response
                 }
-                RecordingStatus.CANCELED -> {
+                RecordingStatus.CANCELING, RecordingStatus.CANCELED -> {
                     call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
                 }
             }

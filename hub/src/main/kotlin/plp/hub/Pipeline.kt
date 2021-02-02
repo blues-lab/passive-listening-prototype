@@ -173,13 +173,16 @@ private fun blockForUserRecordingControl(state: RecordingState) {
         when (state.status) {
             RecordingStatus.ACTIVE -> {
                 logger.info { "pausing recording" }
-                state.status = RecordingStatus.PAUSED
+                state.status = RecordingStatus.PAUSING
+            }
+            RecordingStatus.PAUSING -> {
+                logger.warning { "recording is in the process of being paused, please wait" }
             }
             RecordingStatus.PAUSED -> {
                 logger.info { "restarting recording" }
                 state.status = RecordingStatus.ACTIVE
             }
-            RecordingStatus.CANCELED -> {
+            RecordingStatus.CANCELING, RecordingStatus.CANCELED -> {
                 logger.warning("recording status is unexpectedly ${state.status}")
             }
         }
@@ -207,7 +210,7 @@ fun runRecordingHub(dataDirectory: Path, channelChoice: GrpcChannelChoice) = run
 
     // Gracefully stop recording
     logger.info { "stopping recording job" }
-    state.status = RecordingStatus.CANCELED
+    state.status = RecordingStatus.CANCELING
     recordingJob.join()
     logger.info { "recording pipeline has been shut down" }
 

@@ -6,7 +6,9 @@ import kotlin.io.path.Path
 
 enum class RecordingStatus {
     ACTIVE,
+    PAUSING,
     PAUSED,
+    CANCELING,
     CANCELED,
 }
 
