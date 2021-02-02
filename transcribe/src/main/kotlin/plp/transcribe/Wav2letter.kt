@@ -47,7 +47,7 @@ internal fun extractTextFromWav2letterOutput(output: String): String {
  * @param fileToTranscribe the file to transcribe
  * @param modelDir the directory that contains the model files needed by wav2letter
  */
-fun transcribeFile(fileToTranscribe: File, modelDir: File): String {
+private fun transcribeFile(fileToTranscribe: File, modelDir: File): String {
     val transcriptionDir = fileToTranscribe.parent
     val filename = fileToTranscribe.name
     val modelPath = modelDir.absolutePath
