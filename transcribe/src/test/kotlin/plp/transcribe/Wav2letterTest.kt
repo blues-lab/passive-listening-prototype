@@ -96,4 +96,33 @@ class Wav2letterTest {
 
         assertEquals(expected, extractTextFromWav2letterOutput(commandOutput))
     }
+
+    @Test
+    fun `filter doesn't change valid transcripts`() {
+        assertEquals("hello world", filterTranscribedSilence("hello world"))
+    }
+
+    @Test
+    fun `filters out transcripts that are just h`() {
+        assertEquals("", filterTranscribedSilence("h h h h h h h"))
+    }
+
+    @Test
+    fun `filters out transcripts that have h with different whitespace`() {
+        assertEquals("", filterTranscribedSilence("h h h        h h h h"))
+        assertEquals("", filterTranscribedSilence("h                      h"))
+        assertEquals("", filterTranscribedSilence("               h                      h    "))
+        assertEquals(
+            "",
+            filterTranscribedSilence(
+                """               h      
+            
+                           h 
+                             h
+                              h
+                                h 
+                                """
+            )
+        )
+    }
 }

@@ -36,6 +36,12 @@ open class RegisteredRecording(recording: Recording, val id: Long) : Recording(r
 
 open class TranscribedRecording(recording: RegisteredRecording, val transcription: String, val transcriptId: Long) :
     RegisteredRecording(recording, recording.id) {
+
+    /**
+     * This boolean represents whether this recording's transcription has any usable text.
+     */
+    val usableTranscription = transcription == ""
+
     override fun fieldsToString(): String {
         return super.fieldsToString() + ", transcription=$transcription"
     }
@@ -74,15 +80,19 @@ fun CoroutineScope.classifyRecording(
     logger.debug { "classifying recording $recording" }
 
     if (recording is TranscribedRecording) {
-        classifiers.map { classifier ->
-            launch {
-                try {
-                    val classification = classifier.classifyRecording(recording)
-                    database.saveClassification(recording, classification)
-                } catch (err: io.grpc.StatusException) {
-                    logger.error("classification failed: $err")
+        if (recording.usableTranscription) {
+            classifiers.map { classifier ->
+                launch {
+                    try {
+                        val classification = classifier.classifyRecording(recording)
+                        database.saveClassification(recording, classification)
+                    } catch (err: io.grpc.StatusException) {
+                        logger.error("classification failed: $err")
+                    }
                 }
             }
+        } else {
+            logger.debug { "recording has no usable transcription, skipping classification" }
         }
     } else {
         logger.debug { "recording hasn't been transcribed, skipping classification" }

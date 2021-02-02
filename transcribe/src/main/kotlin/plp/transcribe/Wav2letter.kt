@@ -82,14 +82,33 @@ private fun transcribeFile(fileToTranscribe: File, modelDir: File): String {
     return transcript
 }
 
+/** Regex representing silence in the transcript */
+private val SILENCE_REGEX = Regex("""[h\s]+""")
+
+/**
+ * Given a transcript, return an empty string if the transcript is inferred to just cover silence.
+ * Otherwise, return the original transcript.
+ *
+ * This is needed because if wav2letter gets audio without any talking,
+ * it will return a non-empty transcript that looks like "h h h h h"
+ */
+fun filterTranscribedSilence(transcript: String): String {
+    return if (SILENCE_REGEX matches transcript) {
+        logger.trace { "based on heuristics, transcript is just silence" }
+        ""
+    } else {
+        transcript
+    }
+}
+
 class Wav2letterTranscriber(private val modelDir: Path) : Transcriber {
     private val semaphore = Semaphore(MAX_JOB_COUNT)
 
     override suspend fun transcribeFile(file: Path): String {
-        logger.info { "will start transcription, as soon as semaphore allows "}
+        logger.trace { "will start transcription, as soon as semaphore allows" }
         semaphore.withPermit { // ensures that only MAX_JOB_COUNT jobs are happening at once
-            logger.info { "semaphore allowed, starting transcription"}
-            return transcribeFile(file.toFile(), modelDir.toFile())
+            logger.trace { "semaphore allowed, starting transcription" }
+            return filterTranscribedSilence(transcribeFile(file.toFile(), modelDir.toFile()))
         }
     }
 }
