@@ -4,12 +4,16 @@ import plp.common.runCommandAndGetOutput
 import plp.logging.KotlinLogging
 import java.io.File
 import java.nio.file.Path
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Transcribe audio using wav2letter
  */
 
 private val logger = KotlinLogging.logger {}
+
+/** Number of wav2letter jobs that have been launched */
+val totalJobCount = AtomicInteger(0)
 
 /**
  * Extract the text from a line of wav2letter output
@@ -39,6 +43,7 @@ fun transcribeFile(fileToTranscribe: File, modelDir: File): String {
     val filename = fileToTranscribe.name
     val modelPath = modelDir.absolutePath
     logger.info { "transcribing $filename using model at $modelPath" }
+    val jobId = totalJobCount.getAndIncrement()
     val command = listOf(
         "docker",
         "run",
@@ -50,7 +55,7 @@ fun transcribeFile(fileToTranscribe: File, modelDir: File): String {
         // "-it",
         "--ipc=host",
         "--name",
-        "w2l",
+        "wav2letter_$jobId",
         "-a",
         "stdin",
         "-a",
