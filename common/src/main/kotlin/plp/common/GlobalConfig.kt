@@ -12,9 +12,11 @@ private val logger = KotlinLogging.logger {}
 
 private const val LOCALHOST = "localhost"
 private const val TRANSCRIPTION_SERVICE_PORT = 50057
+private const val VAD_SERVICE_PORT = 50059
 private const val SAMPLE_CLASSIFICATION_SERVICE_PORT = 50060
 val DEFAULT_CONFIG: Config = Config(
     transcriptionService = Service(LOCALHOST, TRANSCRIPTION_SERVICE_PORT),
+    vadService = Service(LOCALHOST, VAD_SERVICE_PORT),
     classificationServices = listOf(Service(LOCALHOST, SAMPLE_CLASSIFICATION_SERVICE_PORT))
 )
 
@@ -25,7 +27,7 @@ var CONFIG_FILENAME = "config.json"
 data class Service(val host: String, val port: Int)
 
 @Serializable
-data class Config(val transcriptionService: Service, val classificationServices: List<Service>)
+data class Config(val transcriptionService: Service, val vadService: Service, val classificationServices: List<Service>)
 
 /** Return the config loaded from default file name/location, or a default config if that doesn't exist */
 fun loadGlobalConfig(): Config {

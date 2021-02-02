@@ -72,6 +72,19 @@ suspend fun transcribeRecording(
 }
 
 @ExperimentalPathApi
+suspend fun checkRecordingForSpeech(
+    vad: VadClient,
+    recording: RegisteredRecording,
+): Boolean {
+    return try {
+        vad.recordingHasSpeech(recording)
+    } catch (err: io.grpc.StatusException) {
+        logger.error("vad failed: $err")
+        true // to be safe, if vad fails, assume it might have speech
+    }
+}
+
+@ExperimentalPathApi
 fun CoroutineScope.classifyRecording(
     database: Database,
     classifiers: ClassificationClientList,
@@ -105,13 +118,18 @@ fun CoroutineScope.classifyRecording(
 fun CoroutineScope.launchJobToHandleRecording(
     database: Database,
     transcriber: Transcriber,
+    vad: VadClient,
     classifiers: ClassificationClientList,
     newRecording: Recording
 ) = launch {
     logger.trace { "inside the new coroutine job to handle pipeline for recording $newRecording" }
     var recording = registerRecording(database, newRecording)
-    recording = transcribeRecording(database, transcriber, recording)
-    classifyRecording(database, classifiers, recording)
+    if (checkRecordingForSpeech(vad, recording)) {
+        recording = transcribeRecording(database, transcriber, recording)
+        classifyRecording(database, classifiers, recording)
+    } else {
+        logger.debug { "recording $recording has no speech, skipping transcription and classification" }
+    }
 }
 
 @ExperimentalCoroutinesApi
@@ -121,6 +139,7 @@ fun launchRecordingPipeline(dataDirectory: Path, channelChoice: GrpcChannelChoic
     state.database = database
     val recorder = MultiSegmentRecorder(DEFAULT_RECORDER, DEFAULT_DURATION_SECONDS, dataDirectory)
     val transcriber = TranscriptionClient(channelChoice)
+    val vad = VadClient(channelChoice)
 
     val classifiers: ClassificationClientList =
         GLOBAL_CONFIG.classificationServices.map { service -> ClassificationClient(channelChoice, service) }
@@ -135,7 +154,7 @@ fun launchRecordingPipeline(dataDirectory: Path, channelChoice: GrpcChannelChoic
         for (newRecording in newRecordings) {
             logger.trace { "received new recording $newRecording in main recording pipeline job. launching new job to handle it. " }
 
-            launchJobToHandleRecording(database, transcriber, classifiers, newRecording).invokeOnCompletion {
+            launchJobToHandleRecording(database, transcriber, vad, classifiers, newRecording).invokeOnCompletion {
                 logger.debug("finished processing recording $i of current session: $newRecording")
                 i++
             }

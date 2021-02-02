@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+service VadService {
+  rpc CheckAudioForSpeech (VadRequest) returns (VadResponse) {}
+}
+
+message VadRequest {
+  int32 id = 1;
+  bytes audio = 10;
+}
+
+message VadResponse {
+  int32 id = 1;
+  bool isSpeech = 10;
+}
