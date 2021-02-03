@@ -19,6 +19,7 @@ dependencies {
     implementation("com.squareup.sqldelight:sqlite-driver:1.4.4")
     implementation("io.ktor:ktor-server-netty:1.5.1")
     implementation("io.ktor:ktor-serialization:1.5.1")
+    runtimeOnly("org.slf4j:slf4j-simple:1.7.30")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 }
 
