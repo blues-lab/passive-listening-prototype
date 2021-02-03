@@ -7,43 +7,11 @@ import io.ktor.response.respondFile
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.get
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import plp.data.Transcript
 import plp.hub.RecordingState
 import plp.hub.database.selectAfterTimestamp
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.div
 import kotlin.io.path.exists
-
-/**
- * A recording chunk, as expected by the dashboard
- */
-@Serializable
-private data class RecordingChunk(
-    val id: Int,
-    val timestamp: Int,
-    @SerialName("audio_id") val audioId: Int,
-    @SerialName("sub_id") val subId: Int,
-    val filename: String,
-    val duration: Float,
-    val transcription: String,
-)
-
-/** Convert a transcript (as stored in the database) to a recording chunk (for the dashboard) */
-private fun transcriptToChunk(transcript: Transcript): RecordingChunk {
-    return transcript.run {
-        RecordingChunk(
-            id = id.toInt(),
-            timestamp = timestamp?.toInt() ?: -1,
-            audioId = audio_id.toInt(),
-            subId = -1,
-            filename = filename,
-            duration = duration.toFloat(),
-            transcription = text ?: "",
-        )
-    }
-}
 
 fun Route.returnRecordings() {
     get("/data") {
@@ -53,11 +21,11 @@ fun Route.returnRecordings() {
             return@get
         }
 
-        val cutoff: Int = call.request.queryParameters["cutoff"]?.toIntOrNull() ?: 0
+        val cutoff = call.request.queryParameters["cutoff"]?.toLongOrNull() ?: 0
 
-        val chunks = database.selectAfterTimestamp(cutoff).map(::transcriptToChunk)
+        val data = database.selectAfterTimestamp(cutoff)
 
-        call.respond(chunks)
+        call.respond(data)
     }
 }
 

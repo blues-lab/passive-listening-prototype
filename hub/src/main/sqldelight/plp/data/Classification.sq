@@ -11,3 +11,14 @@ CREATE TABLE IF NOT EXISTS classification(
 
 insert:
 INSERT INTO classification VALUES (NULL, ?, ?, ?, ?, ?);
+
+selectAllAudio:
+SELECT
+    audio.id AS audio_id,
+    transcript.id AS transcript_id,
+    classification.id AS classification_id,
+    *
+FROM audio
+LEFT JOIN transcript ON audio.id = transcript.audio_id
+LEFT JOIN classification ON transcript.id = classification.transcript_id
+WHERE audio.timestamp > ?;

@@ -3,7 +3,6 @@ package plp.hub.database
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import plp.data.Database
-import plp.data.Transcript
 import plp.hub.DEFAULT_DURATION_SECONDS
 import plp.hub.recording.Recording
 import plp.hub.transcription.TranscribedRecording
@@ -81,16 +80,16 @@ fun Database.saveTranscript(recording: RegisteredRecording, text: String): Long 
     return queries.lastInsertRowId().executeAsOne()
 }
 
-fun Database.selectAfterTimestamp(cutoff: Int = 0): List<Transcript> {
-    val queries = this.transcriptQueries
-
-    return queries.selectAfterTimestamp(cutoff.toDouble()).executeAsList()
+/** Return recordings (with additional data) after the given timestamp */
+fun Database.selectAfterTimestamp(cutoff: Long = 0): List<AudioWithClassification> {
+    val queries = this.classificationQueries
+    val allAudio = queries.selectAllAudio(cutoff).executeAsList()
+    return allAudio.map { it.toSerializable() }
 }
 
 /**
  * Save given classification into the database
  */
-@ExperimentalPathApi
 fun Database.saveClassification(
     recording: TranscribedRecording,
     classification: Classification.ClassificationResponse
