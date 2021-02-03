@@ -80,7 +80,12 @@ fun Database.saveTranscript(recording: RegisteredRecording, text: String): Long 
     return queries.lastInsertRowId().executeAsOne()
 }
 
-/** Return recordings (with additional data) after the given timestamp */
+/**
+ * Return recordings (with additional data) after the given timestamp
+ *
+ * XXX: this returns a new row for each classification, so each audio recording is likely to result in multiple instances.
+ * For now, the client is expected to handle this, but we may consider handling it here in the future.
+ */
 fun Database.selectAfterTimestamp(cutoff: Long = 0): List<AudioWithClassification> {
     val queries = this.classificationQueries
     val allAudio = queries.selectAllAudio(cutoff).executeAsList()
