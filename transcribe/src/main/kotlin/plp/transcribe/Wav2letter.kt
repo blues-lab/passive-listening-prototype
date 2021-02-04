@@ -21,7 +21,7 @@ val totalJobCount = AtomicInteger(0)
  * Extract the text from a line of wav2letter output
  */
 internal fun extractTextFromWav2letterLine(line: String): String? {
-    val regex = Regex("^\\d+,\\d+,(.*)")
+    val regex = Regex("""^\d+,\d+,(.*)""")
     val match = regex.find(line) ?: return null
     return match.groupValues[1]
 }
