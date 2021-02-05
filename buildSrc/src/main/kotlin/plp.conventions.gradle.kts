@@ -27,6 +27,7 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "15"
+    kotlinOptions.useIR = true
 }
 
 tasks.test {
