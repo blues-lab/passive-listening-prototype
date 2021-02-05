@@ -125,4 +125,20 @@ class Wav2letterTest {
             )
         )
     }
+
+    @Test
+    fun `filters out h's but keeps real text`() {
+        assertEquals("hello world", filterTranscribedSilence("h h h        \nhello world"))
+        assertEquals("hello world", filterTranscribedSilence("h h       h        \nhello world"))
+        assertEquals("hello world", filterTranscribedSilence("hello world        \nh h h h"))
+        assertEquals(
+            "hi\nhello world", filterTranscribedSilence(
+                """hi
+            |h h h h
+            |hello world
+            |h
+        """.trimMargin()
+            )
+        )
+    }
 }

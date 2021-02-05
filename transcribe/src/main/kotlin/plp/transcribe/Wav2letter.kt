@@ -76,22 +76,16 @@ private fun transcribeFile(fileToTranscribe: File, modelDir: File): String {
 }
 
 /** Regex representing silence in the transcript */
-private val SILENCE_REGEX = Regex("""[h\s]+""")
+private val SILENCE_REGEX = Regex("""(^|\n)[h\s]+(\n|$)""")
 
 /**
- * Given a transcript, return an empty string if the transcript is inferred to just cover silence.
- * Otherwise, return the original transcript.
- *
- * This is needed because if wav2letter gets audio without any talking,
- * it will return a non-empty transcript that looks like "h h h h h"
+ * wav2letter transcribes silence (or noises it can't deal with) as "h h h h".
+ * This function attempts to filter that out, replacing any such occurrences with an empty string.
+ * It will filter the "h h h" sequences both when they are the entire transcript,
+ * and when they make up only a portion of it.
  */
 fun filterTranscribedSilence(transcript: String): String {
-    return if (SILENCE_REGEX matches transcript) {
-        logger.trace { "based on heuristics, transcript is just silence" }
-        ""
-    } else {
-        transcript
-    }
+    return SILENCE_REGEX.replace(transcript, "$1").trim()
 }
 
 /**
