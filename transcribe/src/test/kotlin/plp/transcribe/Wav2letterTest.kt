@@ -132,7 +132,8 @@ class Wav2letterTest {
         assertEquals("hello world", filterTranscribedSilence("h h       h        \nhello world"))
         assertEquals("hello world", filterTranscribedSilence("hello world        \nh h h h"))
         assertEquals(
-            "hi\nhello world", filterTranscribedSilence(
+            "hi\nhello world",
+            filterTranscribedSilence(
                 """hi
             |h h h h
             |hello world
