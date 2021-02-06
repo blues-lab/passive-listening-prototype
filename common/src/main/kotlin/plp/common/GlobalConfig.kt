@@ -17,7 +17,8 @@ private const val SAMPLE_CLASSIFICATION_SERVICE_PORT = 50060
 val DEFAULT_CONFIG: Config = Config(
     transcriptionService = Service(LOCALHOST, TRANSCRIPTION_SERVICE_PORT),
     vadService = Service(LOCALHOST, VAD_SERVICE_PORT),
-    classificationServices = listOf(Service(LOCALHOST, SAMPLE_CLASSIFICATION_SERVICE_PORT))
+    classificationServices = listOf(Service(LOCALHOST, SAMPLE_CLASSIFICATION_SERVICE_PORT)),
+    dashboardCredentials = Credentials("test", "changeit")
 )
 
 /** The default location where to look for the config */
@@ -27,7 +28,15 @@ var CONFIG_FILENAME = "config.json"
 data class Service(val host: String, val port: Int)
 
 @Serializable
-data class Config(val transcriptionService: Service, val vadService: Service, val classificationServices: List<Service>)
+data class Credentials(val username: String, val password: String)
+
+@Serializable
+data class Config(
+    val transcriptionService: Service,
+    val vadService: Service,
+    val classificationServices: List<Service>,
+    val dashboardCredentials: Credentials,
+)
 
 /** Return the config loaded from default file name/location, or a default config if that doesn't exist */
 fun loadGlobalConfig(): Config {

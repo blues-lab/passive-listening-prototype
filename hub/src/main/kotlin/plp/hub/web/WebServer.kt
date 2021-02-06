@@ -3,6 +3,10 @@ package plp.hub.web
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.auth.UserIdPrincipal
+import io.ktor.auth.authenticate
+import io.ktor.auth.basic
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
@@ -20,6 +24,7 @@ import io.ktor.serialization.json
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import plp.common.GLOBAL_CONFIG
 import plp.hub.RecordingState
 import plp.hub.RecordingStatus
 import plp.logging.KotlinLogging
@@ -50,56 +55,73 @@ fun Application.module() {
         json()
     }
 
+    install(Authentication) {
+        basic("passwordGate") {
+            realm = "dashboard"
+            validate { credentials ->
+                if ((credentials.name == GLOBAL_CONFIG.dashboardCredentials.username) &&
+                    (credentials.password == GLOBAL_CONFIG.dashboardCredentials.password)
+                ) {
+                    UserIdPrincipal(credentials.name)
+                } else {
+                    null
+                }
+            }
+        }
+    }
+
     install(Routing) {
         static("dashboard") {
             files(DASHBOARD_PATH.toFile())
             default((DASHBOARD_PATH / "index.html").toFile())
         }
+        authenticate("passwordGate") {
 
-        returnRecordings()
-        getRecordingAudio()
+            returnRecordings()
+            getRecordingAudio()
 
-        get("/") {
-            call.respondRedirect("/dashboard")
-        }
-
-        get("/recording/status") {
-            val status = RecordingState.status.toString()
-            call.respondText(status, ContentType.Text.Plain)
-        }
-
-        post("/recording/start") {
-            logger.debug { "received start request; current status is ${RecordingState.status}" }
-            when (RecordingState.status) {
-                RecordingStatus.ACTIVE -> {
-                    call.respondText("No change") // TODO: provide standardized JSON response
-                }
-                RecordingStatus.PAUSING, RecordingStatus.PAUSED, RecordingStatus.CANCELING -> {
-                    RecordingState.status = RecordingStatus.ACTIVE
-                    call.respondText("OK")
-                }
-                RecordingStatus.CANCELED -> {
-                    call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
-                }
+            get("/") {
+                call.respondRedirect("/dashboard")
             }
-            logger.debug { "new recording status is ${RecordingState.status}" }
-        }
 
-        post("/recording/stop") {
-            logger.debug { "received start request; current status is ${RecordingState.status}" }
-            when (RecordingState.status) {
-                RecordingStatus.ACTIVE -> {
-                    RecordingState.status = RecordingStatus.PAUSING
-                    call.respondText("OK")
-                }
-                RecordingStatus.PAUSING, RecordingStatus.PAUSED -> {
-                    call.respondText("No change") // TODO: provide standardized JSON response
-                }
-                RecordingStatus.CANCELING, RecordingStatus.CANCELED -> {
-                    call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
-                }
+            get("/recording/status") {
+                val status = RecordingState.status.toString()
+                call.respondText(status, ContentType.Text.Plain)
             }
-            logger.debug { "new recording status is ${RecordingState.status}" }
+
+            post("/recording/start") {
+                logger.debug { "received start request; current status is ${RecordingState.status}" }
+                when (RecordingState.status) {
+                    RecordingStatus.ACTIVE -> {
+                        call.respondText("No change") // TODO: provide standardized JSON response
+                    }
+                    RecordingStatus.PAUSING, RecordingStatus.PAUSED, RecordingStatus.CANCELING -> {
+                        RecordingState.status = RecordingStatus.ACTIVE
+                        call.respondText("OK")
+                    }
+                    RecordingStatus.CANCELED -> {
+                        call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
+                    }
+                }
+                logger.debug { "new recording status is ${RecordingState.status}" }
+            }
+
+            post("/recording/stop") {
+                logger.debug { "received start request; current status is ${RecordingState.status}" }
+                when (RecordingState.status) {
+                    RecordingStatus.ACTIVE -> {
+                        RecordingState.status = RecordingStatus.PAUSING
+                        call.respondText("OK")
+                    }
+                    RecordingStatus.PAUSING, RecordingStatus.PAUSED -> {
+                        call.respondText("No change") // TODO: provide standardized JSON response
+                    }
+                    RecordingStatus.CANCELING, RecordingStatus.CANCELED -> {
+                        call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
+                    }
+                }
+                logger.debug { "new recording status is ${RecordingState.status}" }
+            }
         }
     }
 }

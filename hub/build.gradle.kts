@@ -8,6 +8,8 @@ plugins {
     kotlin("plugin.serialization") version "1.4.21"
 }
 
+val ktorVersion = "1.5.1"
+
 dependencies {
     implementation(project(":common"))
     implementation(project(":logging"))
@@ -17,8 +19,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
     implementation("com.squareup.sqldelight:sqlite-driver:1.4.4")
-    implementation("io.ktor:ktor-server-netty:1.5.1")
-    implementation("io.ktor:ktor-serialization:1.5.1")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-serialization:$ktorVersion")
+    implementation("io.ktor:ktor-auth:$ktorVersion")
     runtimeOnly("org.slf4j:slf4j-simple:1.7.30")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 }
