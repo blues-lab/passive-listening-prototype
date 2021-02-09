@@ -6,6 +6,7 @@ import kotlinx.cli.default
 import kotlinx.cli.required
 import plp.common.CONFIG_FILENAME
 import plp.common.GLOBAL_CONFIG
+import plp.common.Transcriber
 import plp.common.configureLogging
 import plp.common.resolveHomeDirectory
 import plp.common.rpc.server.GrpcServer

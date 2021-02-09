@@ -2,6 +2,7 @@ package plp.transcribe
 
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import plp.common.Transcriber
 import plp.common.runCommandAndGetOutput
 import plp.logging.KotlinLogging
 import java.io.File

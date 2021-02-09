@@ -1,5 +1,6 @@
 package plp.transcribe
 
+import plp.common.Transcriber
 import plp.logging.KotlinLogging
 import java.nio.file.Path
 
