@@ -45,6 +45,7 @@ gradle-app.setting
 
 # CUSTOM
 *.json
+*.wav
 dashboard
 
 # Ignore IDE configs
