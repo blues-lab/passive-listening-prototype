@@ -137,9 +137,14 @@ class Logger(private val name: String) {
             return
         }
 
-        val messageString = msg.invoke().toString()
-        val color = colorForLevel(level)
-        val statement = "$color${getCurrentTime()} - $name - $level - $messageString${Color.RESET}"
-        System.err.println(statement)
+        try {
+            val messageString = msg.invoke().toString()
+            val color = colorForLevel(level)
+            val statement = "$color${getCurrentTime()} - $name - $level - $messageString${Color.RESET}"
+            System.err.println(statement)
+        } catch (e: Exception) {
+            System.err.println("encountered error while trying to log message")
+            e.printStackTrace()
+        }
     }
 }
