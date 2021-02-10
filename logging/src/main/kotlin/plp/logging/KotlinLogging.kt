@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 /** The currently default log level. Anything below this level will not be printed. */
-val LOG_LEVEL = LogLevel.DEBUG
+var DEFAULT_LOG_LEVEL = LogLevel.DEBUG
 
 /**
  * Given a closure, infer the file/class name from it.
@@ -83,6 +83,13 @@ private fun colorForLevel(level: LogLevel): Color {
 
 @Suppress("TooManyFunctions")
 class Logger(private val name: String) {
+    /**
+     * The log level at which this logger will print output.
+     * If null, uses the level set by DEFAULT_LOG_LEVEL
+     * @see DEFAULT_LOG_LEVEL
+     */
+    var logLevel: LogLevel? = null
+
     fun trace(msg: String?) {
         trace { msg }
     }
@@ -125,7 +132,8 @@ class Logger(private val name: String) {
 
     private fun log(level: LogLevel, msg: () -> Any?) {
         // Don't output anything below the current log level
-        if (level < LOG_LEVEL) {
+        val currentLogLevel = this.logLevel ?: DEFAULT_LOG_LEVEL
+        if (level < currentLogLevel) {
             return
         }
 
