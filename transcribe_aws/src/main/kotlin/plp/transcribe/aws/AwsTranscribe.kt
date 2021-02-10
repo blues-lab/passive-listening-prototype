@@ -96,8 +96,7 @@ class AwsTranscribe(private val s3Client: S3) : Transcriber {
         logger.debug { "since transcription job $jobName is finished, cleaning up recording file" }
         s3Client.deleteFile(file.name)
 
-        // val resultUrl = job.transcript().transcriptFileUri()
-        val resultUrl = "https://s3.us-west-2.amazonaws.com/nm-transcriptions/job_sample.wav.json"
+        val resultUrl = job.transcript().transcriptFileUri()
         val resultFilename = S3Location(resultUrl).key
         logger.debug { "retrieving transcription job $jobName result from $resultUrl ($resultFilename in default bucket)" }
         val resultFile = s3Client.getFile(resultFilename)
