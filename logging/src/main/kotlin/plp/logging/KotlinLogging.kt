@@ -35,7 +35,7 @@ private fun getCurrentTime(): String {
  * via https://stackoverflow.com/q/5762491
  */
 @Suppress("MagicNumber")
-enum class Color(val ansiCode: Int) {
+private enum class Color(val ansiCode: Int) {
     RESET(0),
     BLACK(30),    // BLACK
     RED(31),      // RED
@@ -71,7 +71,7 @@ enum class LogLevel { TRACE, DEBUG, INFO, WARNING, ERROR }
 /**
  * Return the appropriate color for the given log level
  */
-fun colorForLevel(level: LogLevel): Color {
+private fun colorForLevel(level: LogLevel): Color {
     return when (level) {
         LogLevel.TRACE -> Color.WHITE
         LogLevel.DEBUG -> Color.CYAN
