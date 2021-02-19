@@ -13,11 +13,13 @@ private val logger = KotlinLogging.logger {}
 private const val LOCALHOST = "localhost"
 private const val TRANSCRIPTION_SERVICE_PORT = 50057
 private const val VAD_SERVICE_PORT = 50059
-private const val SAMPLE_CLASSIFICATION_SERVICE_PORT = 50060
+private const val SHOPPING_CLASSIFICATION_PORT = 50060
+private const val GENERAL_CLASSIFICATION_PORT = 50060
+
 val DEFAULT_CONFIG: Config = Config(
     transcriptionService = Service(LOCALHOST, TRANSCRIPTION_SERVICE_PORT),
     vadService = Service(LOCALHOST, VAD_SERVICE_PORT),
-    classificationServices = listOf(Service(LOCALHOST, SAMPLE_CLASSIFICATION_SERVICE_PORT)),
+    classificationServices = listOf(Service(LOCALHOST, SHOPPING_CLASSIFICATION_PORT), Service(LOCALHOST, GENERAL_CLASSIFICATION_PORT)),
     dashboardCredentials = Credentials("test", "changeit")
 )
 
