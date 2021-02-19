@@ -20,3 +20,14 @@ See instructions one level up
 ## Usage
 
 Some arguments are required. Run with `--help` or no args to see them documented.
+
+
+# Errors with Recording
+If having errors on the default mac recorder, run the MacRecorder by changing the 
+env variable in Record.kt to MacRecorder.
+
+Try running the command 
+```
+ffmpeg -i hw:4,0 -t 30 -ac 1 -ar 16k test.wav
+```
+and check that the recording of the file exists
