@@ -46,3 +46,7 @@ gradle-app.setting
 # CUSTOM
 *.json
 dashboard
+
+# Ignore IDE configs
+.idea/
+.vscode/
