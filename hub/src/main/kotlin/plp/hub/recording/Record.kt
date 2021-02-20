@@ -14,7 +14,7 @@ import kotlin.io.path.div
 
 private const val RECORDING_FILE_EXTENSION = ".wav"
 
-val DEFAULT_RECORDER = RecordFfmpeg
+val DEFAULT_RECORDER = RecordJava
 
 /** How many recordings to buffer before pausing recording */
 const val RECORDING_CHANNEL_BUFFER_SIZE = 10
