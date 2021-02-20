@@ -6,10 +6,14 @@ import plp.logging.KotlinLogging
 private val logger = KotlinLogging.logger {}
 
 enum class OS {
-    WINDOWS, LINUX, MAC, SOLARIS
+    UNKNOWN, WINDOWS, LINUX, MAC, SOLARIS
 }
 
-fun getOS(): OS? {
+/**
+ * Get the current system's OS
+ * via https://stackoverflow.com/a/31547504
+ */
+fun getOS(): OS {
     val os = System.getProperty("os.name").toLowerCase()
     return when {
         os.contains("win") -> {
@@ -24,7 +28,7 @@ fun getOS(): OS? {
         os.contains("sunos") -> {
             OS.SOLARIS
         }
-        else -> null
+        else -> OS.UNKNOWN
     }
 }
 
