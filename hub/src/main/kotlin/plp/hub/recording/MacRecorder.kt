@@ -34,8 +34,7 @@ fun getOS(): OS {
 
 val RecordMac = RecordOnce { durationSeconds, path ->
     logger.info("recording $durationSeconds seconds using ffmpeg to $path")
-    val os = getOS();
-    val ffmpegEncodingFormat = when(os) {
+    val ffmpegEncodingFormat = when (getOS()) {
         OS.LINUX -> "alsa"
         OS.MAC -> "avfoundation"
         else -> "unknown"
@@ -45,7 +44,7 @@ val RecordMac = RecordOnce { durationSeconds, path ->
         listOf(
             "ffmpeg",
             "-f",
-            "alsa",
+            ffmpegEncodingFormat,
             "-i",
             ":0",
             "-t",
