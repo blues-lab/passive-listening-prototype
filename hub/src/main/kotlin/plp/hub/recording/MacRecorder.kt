@@ -8,10 +8,10 @@ import plp.logging.KotlinLogging
 private val logger = KotlinLogging.logger {}
 
 val RecordMac: RecordOnce = run {
-    val ffmpegEncodingFormat = when (getOS()) {
+    val ffmpegEncodingFormat = when (val os = getOS()) {
         OS.LINUX -> "alsa"
         OS.MAC -> "avfoundation"
-        else -> "unknown"
+        else -> throw AudioRecordingException("no known ffmpeg format for OS $os")
     }
     logger.debug { "setting up FfmpegRecorder using $ffmpegEncodingFormat" }
 
