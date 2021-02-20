@@ -7,7 +7,7 @@ import plp.logging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-val RecordMac: RecordOnce = run {
+val RecordFfmpeg: RecordOnce = run {
     val ffmpegEncodingFormat = when (val os = getOS()) {
         OS.LINUX -> "alsa"
         OS.MAC -> "avfoundation"
