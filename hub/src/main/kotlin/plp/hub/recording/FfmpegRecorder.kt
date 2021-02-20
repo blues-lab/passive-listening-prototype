@@ -16,7 +16,7 @@ val RecordFfmpeg: RecordOnce = run {
     logger.debug { "setting up FfmpegRecorder using $ffmpegEncodingFormat" }
 
     RecordOnce { durationSeconds, path ->
-        logger.info("recording $durationSeconds seconds using ffmpeg to $path")
+        logger.info { "recording $durationSeconds seconds using ffmpeg to $path" }
 
         runCommandAndGetOutput(
             listOf(
@@ -35,6 +35,6 @@ val RecordFfmpeg: RecordOnce = run {
             )
         )
 
-        logger.debug("recording finished $path")
+        logger.debug { "recording finished $path" }
     }
 }
