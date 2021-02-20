@@ -20,3 +20,17 @@ See instructions one level up
 ## Usage
 
 Some arguments are required. Run with `--help` or no args to see them documented.
+
+
+# Errors with recording
+If having errors on the default (Java) recorder, run the FfmpegRecorder by changing the 
+variable in Record.kt to FfmpegRecorder.
+
+Additionally, if your preferred microphone isn't the preferred one,
+try running the command 
+```
+ffmpeg -i hw:4,0 -t 30 -ac 1 -ar 16k test.wav
+```
+and check that the recording of the file exists
+
+If not, you might need to play around with the `-i` parameter.
