@@ -22,12 +22,15 @@ See instructions one level up
 Some arguments are required. Run with `--help` or no args to see them documented.
 
 
-# Errors with Recording
-If having errors on the default mac recorder, run the MacRecorder by changing the 
-env variable in Record.kt to MacRecorder.
+# Errors with recording
+If having errors on the default (Java) recorder, run the FfmpegRecorder by changing the 
+variable in Record.kt to FfmpegRecorder.
 
-Try running the command 
+Additionally, if your preferred microphone isn't the preferred one,
+try running the command 
 ```
 ffmpeg -i hw:4,0 -t 30 -ac 1 -ar 16k test.wav
 ```
 and check that the recording of the file exists
+
+If not, you might need to play around with the `-i` parameter.
