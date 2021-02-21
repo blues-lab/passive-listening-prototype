@@ -7,7 +7,7 @@ import kotlin.test.assertFailsWith
 class ExternalCommandTest {
     @Test
     fun `external command returns output string`() {
-        assertEquals("Hello, world!\n", runCommandAndGetOutput(listOf("echo", "Hello, world!")))
+        assertEquals("Hello, world!", runCommandAndGetOutput(listOf("echo", "Hello, world!")))
     }
 
     @Test
