@@ -29,7 +29,8 @@ fun main(args: Array<String>) {
     val logger = KotlinLogging.logger {}
     logger.info("starting Transcription server")
 
-    val s3 = S3()
+    val bucket = getConfiguredBucket()
+    val s3 = S3(bucket)
     val transcriber = AwsTranscribe(s3)
     val service = TranscriptionService(transcriber, Path(resolveHomeDirectory(tmpDir)))
 

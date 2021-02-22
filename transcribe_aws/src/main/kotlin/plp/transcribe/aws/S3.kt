@@ -22,8 +22,6 @@ fun Bucket.pathToFile(key: String): String {
     return "s3://$this/$key"
 }
 
-private const val BUCKET: Bucket = "nm-transcriptions"
-
 val REGION: Region = Region.US_WEST_2
 
 /** A location in S3 */
@@ -39,7 +37,7 @@ class S3Location(url: String) {
     }
 }
 
-class S3(val bucket: Bucket = BUCKET) {
+class S3(val bucket: Bucket) {
     private val s3Client = S3Client.builder().region(REGION).build()
 
     fun uploadFile(file: File) {

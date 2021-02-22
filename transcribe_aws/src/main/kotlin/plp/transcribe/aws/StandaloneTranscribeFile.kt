@@ -15,7 +15,8 @@ fun main(args: Array<String>) {
 
     val filePath = file.toPath()
 
-    val s3 = S3()
+    val bucket = getConfiguredBucket()
+    val s3 = S3(bucket)
     val transcriber = AwsTranscribe(s3)
     val transcript: String = runBlocking { transcriber.transcribeFile(filePath) }
     println(transcript)
