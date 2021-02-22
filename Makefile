@@ -9,9 +9,9 @@ classify_cli: build
 vad_service: build
 	cd vad_service && poetry run python src/VadServiceMain.py
 transcribe: build
-	./transcribe/build/install/transcribe/bin/transcribe
+	./transcribe/build/install/transcribe/bin/transcribe --tmpDir /tmp
 all: build
 	./hub/build/install/hub/bin/hub --dataDir /tmp &
-	./transcribe/build/install/transcribe/bin/transcribe
+	./transcribe/build/install/transcribe/bin/transcribe --tmpDir /tmp &
 	cd vad_service && poetry run python src/VadServiceMain.py &
 # can bring jobs to foreground via `fg` command
