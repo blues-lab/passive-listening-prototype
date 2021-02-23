@@ -20,6 +20,7 @@ dependencies {
     implementation("software.amazon.awssdk:transcribe:$awsSdkVersion")
     runtimeOnly("org.slf4j:slf4j-simple:1.7.30")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+    implementation("org.hjson:hjson:3.0.0")
 }
 
 application {

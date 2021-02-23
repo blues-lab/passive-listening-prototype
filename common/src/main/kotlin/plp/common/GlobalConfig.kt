@@ -44,7 +44,7 @@ fun loadGlobalConfig(): Config {
 
     return if (configFile.exists()) {
         val configJson = JsonValue.readHjson(configFile.reader()).toString()
-        val config = Json { ignoreUnknownKeys }.decodeFromString<Config>(configJson)
+        val config = Json { ignoreUnknownKeys = true }.decodeFromString<Config>(configJson)
         logger.debug { "successfully loaded config from `${configFile.absolutePath}`" }
         config
     } else {
