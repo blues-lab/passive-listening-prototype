@@ -38,19 +38,32 @@ data class Config(
     val dashboardCredentials: Credentials,
 )
 
+/**
+ * Load the config file with the given path/name and convert it from Hjson (https://hjson.github.io/) to a valid JSON string
+ *
+ * @return the contents of the given file as JSON string, or null if the file doesn't exist
+ */
+fun loadConfigJson(filename: String): String? {
+    val configFile = File(filename)
+    if (!configFile.exists()) {
+        logger.warning("""couldn't locate config file `${configFile.absolutePath}`""")
+        return null
+    }
+
+    logger.debug { "successfully loaded config from `$configFile`" }
+    return JsonValue.readHjson(configFile.reader()).toString()
+}
+
 /** Return the config loaded from default file name/location, or a default config if that doesn't exist */
 fun loadGlobalConfig(): Config {
-    val configFile = File(CONFIG_FILENAME)
-
-    return if (configFile.exists()) {
-        val configJson = JsonValue.readHjson(configFile.reader()).toString()
+    val configJson = loadConfigJson(CONFIG_FILENAME)
+    return if (configJson != null) {
         val config = Json { ignoreUnknownKeys = true }.decodeFromString<Config>(configJson)
-        logger.debug { "successfully loaded config from `${configFile.absolutePath}`" }
         config
     } else {
         val defaultConfigSerialized = Json { prettyPrint = true }.encodeToString(DEFAULT_CONFIG)
         logger.warning(
-            """couldn't locate config file `${configFile.absolutePath}`, using default:
+            """using default config:
 ```json
 $defaultConfigSerialized
 ```"""

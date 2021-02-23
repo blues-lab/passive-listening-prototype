@@ -4,9 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.hjson.JsonValue
 import plp.common.CONFIG_FILENAME
-import java.io.File
+import plp.common.loadConfigJson
 
 @Serializable
 data class AwsConfig(val bucket: Bucket)
@@ -19,14 +18,11 @@ private data class TopLevelConfig(
 var AWS_CONFIG_FILENAME = CONFIG_FILENAME
 
 private fun getConfig(): AwsConfig {
-    val configFile = File(AWS_CONFIG_FILENAME)
-    if (!configFile.exists()) {
-        throw RuntimeException(
-            "missing config file (expected ${configFile.absolutePath}) that should look like this: " +
-                """{"bucket": "BUCKET_NAME"}"""
+    val configContents = loadConfigJson(AWS_CONFIG_FILENAME)
+        ?: throw RuntimeException(
+            "missing config file $AWS_CONFIG_FILENAME that should look like this: " +
+                """{"transcribe_aws": {"bucket": "BUCKET_NAME"}}"""
         )
-    }
-    val configContents = JsonValue.readHjson(configFile.reader()).toString()
     return Json { ignoreUnknownKeys = true }.decodeFromString<TopLevelConfig>(configContents).awsConfig
 }
 
