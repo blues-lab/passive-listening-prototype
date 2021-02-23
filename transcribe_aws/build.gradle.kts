@@ -7,7 +7,7 @@ plugins {
     kotlin("plugin.serialization") version "1.4.30"
 }
 
-val awsSdkVersion = "2.15.78"
+val awsSdkVersion = "2.16.4"
 
 dependencies {
     implementation(project(":common"))
@@ -19,7 +19,7 @@ dependencies {
     implementation("software.amazon.awssdk:s3:$awsSdkVersion")
     implementation("software.amazon.awssdk:transcribe:$awsSdkVersion")
     runtimeOnly("org.slf4j:slf4j-simple:1.7.30")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 }
 
 application {
