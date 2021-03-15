@@ -4,10 +4,10 @@ plugins {
     application
     id("plp.conventions")
     id("plp.grpc")
-    kotlin("plugin.serialization") version "1.4.30"
+    kotlin("plugin.serialization") version "1.4.31"
 }
 
-val awsSdkVersion = "2.16.4"
+val awsSdkVersion = "2.16.18"
 
 dependencies {
     implementation(project(":common"))
@@ -15,7 +15,7 @@ dependencies {
     api(project(":proto")) // only necessary for IntelliJ to find sources
     protobuf(project(":proto"))
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.2")
     implementation("software.amazon.awssdk:s3:$awsSdkVersion")
     implementation("software.amazon.awssdk:transcribe:$awsSdkVersion")
     runtimeOnly("org.slf4j:slf4j-simple:1.7.30")

@@ -13,7 +13,7 @@ dependencies {
     api(project(":proto")) // only necessary for IntelliJ to find sources
     protobuf(project(":proto"))
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.2")
 }
 
 application {
