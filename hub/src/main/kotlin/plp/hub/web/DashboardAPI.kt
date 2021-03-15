@@ -1,17 +1,68 @@
 package plp.hub.web
 
 import io.ktor.application.call
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.response.respondFile
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.get
+import io.ktor.routing.post
 import plp.hub.RecordingState
+import plp.hub.RecordingStatus
 import plp.hub.database.selectAfterTimestamp
+import plp.logging.KotlinLogging
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.div
 import kotlin.io.path.exists
+
+private val logger = KotlinLogging.logger { }
+
+fun Route.getRecordingStatus() {
+    get("/recording/status") {
+        val status = RecordingState.status.toString()
+        call.respondText(status, ContentType.Text.Plain)
+    }
+}
+
+fun Route.startRecording() {
+    post("/recording/start") {
+        logger.debug { "received start request; current status is ${RecordingState.status}" }
+        when (RecordingState.status) {
+            RecordingStatus.ACTIVE -> {
+                call.respondText("No change") // TODO: provide standardized JSON response
+            }
+            RecordingStatus.PAUSING, RecordingStatus.PAUSED, RecordingStatus.CANCELING -> {
+                RecordingState.status = RecordingStatus.ACTIVE
+                call.respondText("OK")
+            }
+            RecordingStatus.CANCELED -> {
+                call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
+            }
+        }
+        logger.debug { "new recording status is ${RecordingState.status}" }
+    }
+}
+
+fun Route.stopRecording() {
+    post("/recording/stop") {
+        logger.debug { "received start request; current status is ${RecordingState.status}" }
+        when (RecordingState.status) {
+            RecordingStatus.ACTIVE -> {
+                RecordingState.status = RecordingStatus.PAUSING
+                call.respondText("OK")
+            }
+            RecordingStatus.PAUSING, RecordingStatus.PAUSED -> {
+                call.respondText("No change") // TODO: provide standardized JSON response
+            }
+            RecordingStatus.CANCELING, RecordingStatus.CANCELED -> {
+                call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
+            }
+        }
+        logger.debug { "new recording status is ${RecordingState.status}" }
+    }
+}
 
 fun Route.returnRecordings() {
     get("/data") {

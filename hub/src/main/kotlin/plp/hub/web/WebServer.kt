@@ -84,44 +84,9 @@ fun Application.module() {
                 call.respondRedirect("/dashboard")
             }
 
-            get("/recording/status") {
-                val status = RecordingState.status.toString()
-                call.respondText(status, ContentType.Text.Plain)
-            }
-
-            post("/recording/start") {
-                logger.debug { "received start request; current status is ${RecordingState.status}" }
-                when (RecordingState.status) {
-                    RecordingStatus.ACTIVE -> {
-                        call.respondText("No change") // TODO: provide standardized JSON response
-                    }
-                    RecordingStatus.PAUSING, RecordingStatus.PAUSED, RecordingStatus.CANCELING -> {
-                        RecordingState.status = RecordingStatus.ACTIVE
-                        call.respondText("OK")
-                    }
-                    RecordingStatus.CANCELED -> {
-                        call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
-                    }
-                }
-                logger.debug { "new recording status is ${RecordingState.status}" }
-            }
-
-            post("/recording/stop") {
-                logger.debug { "received start request; current status is ${RecordingState.status}" }
-                when (RecordingState.status) {
-                    RecordingStatus.ACTIVE -> {
-                        RecordingState.status = RecordingStatus.PAUSING
-                        call.respondText("OK")
-                    }
-                    RecordingStatus.PAUSING, RecordingStatus.PAUSED -> {
-                        call.respondText("No change") // TODO: provide standardized JSON response
-                    }
-                    RecordingStatus.CANCELING, RecordingStatus.CANCELED -> {
-                        call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
-                    }
-                }
-                logger.debug { "new recording status is ${RecordingState.status}" }
-            }
+            getRecordingStatus()
+            startRecording()
+            stopRecording()
         }
     }
 }
