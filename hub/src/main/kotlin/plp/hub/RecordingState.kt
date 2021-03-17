@@ -13,7 +13,7 @@ enum class RecordingStatus {
 }
 
 object RecordingState {
-    var status = RecordingStatus.ACTIVE
+    var status = RecordingStatus.PAUSED
     var database: Database? = null
 
     @ExperimentalPathApi
