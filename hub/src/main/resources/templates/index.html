@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="5">
+    <title>Dashboard</title>
+</head>
+<body>
+<div style="position: fixed; right: 50px">
+    <button type="button" onclick="javascript:window.scrollBy(0, -100);">Scroll up</button>
+    <button type="button" onclick="javascript:window.scrollBy(0, 100);">Scroll down</button>
+</div>
+<table>
+    <tbody>
+    {{#recordings}}
+    <tr>
+        <td>{{timestamp}}</td>
+        <td>
+            <a href="/audio/{{filename}}">audio</a>
+        </td>
+        <td>{{text}}</td>
+        <td>{{classifier}}</td>
+        <td>{{classification}}</td>
+        <td>{{extras}}</td>
+    </tr>
+    {{/recordings}}
+    </tbody>
+</table>
+</body>
+</html>

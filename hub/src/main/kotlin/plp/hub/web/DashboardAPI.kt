@@ -3,6 +3,7 @@ package plp.hub.web
 import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.mustache.MustacheContent
 import io.ktor.response.respond
 import io.ktor.response.respondFile
 import io.ktor.response.respondText
@@ -18,6 +19,37 @@ import kotlin.io.path.div
 import kotlin.io.path.exists
 
 private val logger = KotlinLogging.logger { }
+
+/** Reset the template engine's cache */
+fun Route.clearTemplateCache() {
+    get("/_reset_templates") {
+        serverTemplateEngine?.clearCache()
+        call.respondText("Template cache cleared", ContentType.Text.Plain)
+    }
+}
+
+fun Route.showDashboard() {
+    get("/") {
+        val database = RecordingState.database
+        if (database == null) {
+            call.respondText(text = "Database not initialized", status = HttpStatusCode.InternalServerError)
+            return@get
+        }
+
+        val cutoff = call.request.queryParameters["cutoff"]?.toLongOrNull() ?: 0
+
+        val data = database.selectAfterTimestamp(cutoff)
+
+        call.respond(
+            MustacheContent(
+                "index.html",
+                mapOf(
+                    "recordings" to data
+                )
+            )
+        )
+    }
+}
 
 fun Route.getRecordingStatus() {
     get("/recording/status") {

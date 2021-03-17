@@ -1,7 +1,6 @@
 package plp.hub.web
 
 import io.ktor.application.Application
-import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
@@ -11,9 +10,8 @@ import io.ktor.features.DefaultHeaders
 import io.ktor.http.content.default
 import io.ktor.http.content.files
 import io.ktor.http.content.static
-import io.ktor.response.respondRedirect
+import io.ktor.mustache.Mustache
 import io.ktor.routing.Routing
-import io.ktor.routing.get
 import io.ktor.serialization.json
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
@@ -44,6 +42,13 @@ val DASHBOARD_PATH: Path = Path(
         ?: "dashboard".also { logger.warning("DASHBOARD_PATH not specified in environment; using default path (./dashboard)") }
 )
 
+/**
+ * The template engine used by the server.
+ * It's made available here, so that routes can access it for cache invalidation
+ * (a somewhat ugly solution that helps debugging).
+ */
+var serverTemplateEngine: InvalidatableMustacheFactory? = null
+
 @ExperimentalPathApi
 fun Application.module() {
     install(DefaultHeaders)
@@ -57,23 +62,27 @@ fun Application.module() {
         enableBasicAuthentication(AUTHENTICATION_GROUP)
     }
 
+    install(Mustache) {
+        val factory = InvalidatableMustacheFactory("templates")
+        this.mustacheFactory = factory
+        serverTemplateEngine = factory
+    }
+
     install(Routing) {
         static("dashboard") {
             files(DASHBOARD_PATH.toFile())
             default((DASHBOARD_PATH / "index.html").toFile())
         }
         authenticate(AUTHENTICATION_GROUP) {
-
+            showDashboard()
             returnRecordings()
             getRecordingAudio()
-
-            get("/") {
-                call.respondRedirect("/dashboard")
-            }
-
             getRecordingStatus()
             startRecording()
             stopRecording()
+
+            // Debug paths
+            clearTemplateCache()
         }
     }
 }
@@ -82,7 +91,12 @@ fun Application.module() {
 fun startWebserver(): ApplicationEngine {
     logger.debug { "starting web server" }
     val server =
-        embeddedServer(Netty, WEB_SERVICE_PORT, watchPaths = listOf("WebServiceKt"), module = Application::module)
+        embeddedServer(
+            Netty,
+            WEB_SERVICE_PORT,
+            // watchPaths = listOf("web"), // disabled because it doesn't seem to pick up on the current file's path. Instead all changes should be picked up, which is fine.
+            module = Application::module
+        )
     server.start()
     logger.debug { "started web server" }
     return server
