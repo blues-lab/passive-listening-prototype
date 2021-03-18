@@ -30,6 +30,17 @@ fun Route.clearTemplateCache() {
 
 fun Route.showDashboard() {
     get("/") {
+        call.respond(
+            MustacheContent(
+                "index.html",
+                mapOf<String, Unit>()
+            )
+        )
+    }
+}
+
+fun Route.renderRecordings() {
+    get("/api/recordings") {
         val database = RecordingState.database
         if (database == null) {
             call.respondText(text = "Database not initialized", status = HttpStatusCode.InternalServerError)
@@ -42,7 +53,7 @@ fun Route.showDashboard() {
 
         call.respond(
             MustacheContent(
-                "index.html",
+                "recordings.html",
                 mapOf(
                     "recordings" to data
                 )

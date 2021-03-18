@@ -75,6 +75,7 @@ fun Application.module() {
         }
         authenticate(AUTHENTICATION_GROUP) {
             showDashboard()
+            renderRecordings()
             returnRecordings()
             getRecordingAudio()
             getRecordingStatus()
