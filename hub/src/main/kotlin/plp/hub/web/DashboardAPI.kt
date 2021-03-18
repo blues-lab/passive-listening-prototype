@@ -6,6 +6,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.mustache.MustacheContent
 import io.ktor.response.respond
 import io.ktor.response.respondFile
+import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.get
@@ -33,7 +34,7 @@ fun Route.showDashboard() {
         call.respond(
             MustacheContent(
                 "index.html",
-                mapOf<String, Unit>()
+                emptyMap<String, Unit>()
             )
         )
     }
@@ -62,48 +63,55 @@ fun Route.renderRecordings() {
     }
 }
 
-fun Route.getRecordingStatus() {
-    get("/recording/status") {
-        val status = RecordingState.status.toString()
-        call.respondText(status, ContentType.Text.Plain)
+fun Route.showRecordingControlButton() {
+    get("/api/recording/control") {
+        when (RecordingState.status) {
+            RecordingStatus.ACTIVE -> call.respond(
+                MustacheContent(
+                    "recording_control_pause.html",
+                    emptyMap<String, Unit>()
+                )
+            )
+            RecordingStatus.PAUSED -> call.respond(
+                MustacheContent(
+                    "recording_control_start.html",
+                    emptyMap<String, Unit>()
+                )
+            )
+            else -> call.respondText("", ContentType.Text.Html)
+        }
     }
 }
 
 fun Route.startRecording() {
-    post("/recording/start") {
+    post("/api/recording/start") {
         logger.debug { "received start request; current status is ${RecordingState.status}" }
         when (RecordingState.status) {
-            RecordingStatus.ACTIVE -> {
-                call.respondText("No change") // TODO: provide standardized JSON response
-            }
             RecordingStatus.PAUSING, RecordingStatus.PAUSED, RecordingStatus.CANCELING -> {
                 RecordingState.status = RecordingStatus.ACTIVE
-                call.respondText("OK")
             }
-            RecordingStatus.CANCELED -> {
-                call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
+            else -> {
+                logger.debug { "received stop request, but current status is ${RecordingState.status}. no change." }
             }
         }
         logger.debug { "new recording status is ${RecordingState.status}" }
+        call.respondRedirect("/api/recording/control")
     }
 }
 
 fun Route.stopRecording() {
-    post("/recording/stop") {
+    post("/api/recording/stop") {
         logger.debug { "received start request; current status is ${RecordingState.status}" }
         when (RecordingState.status) {
             RecordingStatus.ACTIVE -> {
                 RecordingState.status = RecordingStatus.PAUSING
-                call.respondText("OK")
             }
-            RecordingStatus.PAUSING, RecordingStatus.PAUSED -> {
-                call.respondText("No change") // TODO: provide standardized JSON response
-            }
-            RecordingStatus.CANCELING, RecordingStatus.CANCELED -> {
-                call.respondText("Pipeline stopped", status = HttpStatusCode.BadRequest)
+            else -> {
+                logger.debug { "received stop request, but current status is ${RecordingState.status}. no change." }
             }
         }
         logger.debug { "new recording status is ${RecordingState.status}" }
+        call.respondRedirect("/api/recording/control")
     }
 }
 
