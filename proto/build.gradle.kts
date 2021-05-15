@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
 }
 

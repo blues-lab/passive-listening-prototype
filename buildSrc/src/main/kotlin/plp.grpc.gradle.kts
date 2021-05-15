@@ -9,9 +9,9 @@ plugins {
     id("com.google.protobuf")
 }
 
-val grpcVersion = "1.36.0"
-val grpcKotlinVersion = "1.0.0"
-val protobufVersion = "3.14.0"
+val grpcVersion = "1.37.1"
+val grpcKotlinVersion = "1.1.0"
+val protobufVersion = "3.17.0"
 
 allprojects {
     repositories {
@@ -22,8 +22,11 @@ allprojects {
 
 dependencies {
     api("com.google.protobuf:protobuf-java-util:$protobufVersion")
-    api("io.grpc:grpc-kotlin-stub:1.0.0")
+    api("io.grpc:grpc-kotlin-stub:1.1.0")
     implementation("io.grpc:grpc-netty-shaded:$grpcVersion")
+
+    implementation("io.grpc:grpc-protobuf:$grpcVersion") // necessary for non-Android builds according to https://github.com/grpc/grpc-java
+    compileOnly("org.apache.tomcat:annotations-api:6.0.53") // necessary for Java 9+ according to https://github.com/grpc/grpc-java
 }
 
 protobuf {

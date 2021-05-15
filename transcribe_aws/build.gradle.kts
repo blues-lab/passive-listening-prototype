@@ -4,10 +4,10 @@ plugins {
     application
     id("plp.conventions")
     id("plp.grpc")
-    kotlin("plugin.serialization") version "1.4.31"
+    kotlin("plugin.serialization") version "1.5.0"
 }
 
-val awsSdkVersion = "2.16.18"
+val awsSdkVersion = "2.16.63"
 
 dependencies {
     implementation(project(":common"))
@@ -19,7 +19,7 @@ dependencies {
     implementation("software.amazon.awssdk:s3:$awsSdkVersion")
     implementation("software.amazon.awssdk:transcribe:$awsSdkVersion")
     runtimeOnly("org.slf4j:slf4j-simple:1.7.30")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
 }
 
 application {

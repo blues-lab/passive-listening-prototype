@@ -28,7 +28,6 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "15"
-    kotlinOptions.useIR = true
 }
 
 tasks.test {
@@ -39,6 +38,8 @@ tasks.getByPath("detekt").onlyIf { gradle.startParameter.taskNames.contains("det
 
 
 ktlint {
+    version.set("0.41.0")
+
     filter {
         exclude("build/**")
         exclude("**/generated/**")
@@ -51,7 +52,15 @@ ktlint {
 }
 
 detekt {
-    toolVersion = "1.15.0"
+    toolVersion = "1.16.0"
     config = files("${rootDir}/detekt.yml")
     buildUponDefaultConfig = true
+}
+
+// documented at https://github.com/ben-manes/gradle-versions-plugin
+tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
+    gradleReleaseChannel = "current" // rather than nightly or release-candidate (the default)
+    rejectVersionIf {
+        listOf("-m", "-rc", "-alpha", "-beta").any { it in candidate.version.toLowerCase() }
+    }
 }

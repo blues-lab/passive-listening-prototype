@@ -1,11 +1,11 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
     java
     application
     id("plp.conventions")
     id("plp.grpc")
-    id("com.squareup.sqldelight") version "1.4.4"
-    kotlin("plugin.serialization") version "1.4.31"
+    id("com.squareup.sqldelight") version "1.5.0"
+    kotlin("plugin.serialization") version "1.5.0"
 }
 
 val ktorVersion = "1.5.2"
@@ -16,15 +16,15 @@ dependencies {
     api(project(":proto")) // only necessary for IntelliJ to find sources
     protobuf(project(":proto"))
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.2")
-    implementation("com.squareup.sqldelight:sqlite-driver:1.4.4")
+    implementation("com.squareup.sqldelight:sqlite-driver:1.5.0")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-serialization:$ktorVersion")
     implementation("io.ktor:ktor-auth:$ktorVersion")
     implementation("io.ktor:ktor-mustache:$ktorVersion")
     runtimeOnly("org.slf4j:slf4j-simple:1.7.30")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
 }
 
 repositories {
