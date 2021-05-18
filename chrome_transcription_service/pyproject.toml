@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "passive_listening_vad_service"
+version = "0.1.0"
+description = ""
+authors = []
+
+[tool.poetry.dependencies]
+python = ">=3.7.1"
+sclog = "*"
+grpcio = "^1.35.0"
+protobuf = "^3.14.0"
+colorlog = "^4.7.2"
+webrtcvad = "^2.0.10"
+
+[tool.poetry.dev-dependencies]
+pylint = "*"
+mypy = "*"
+black = "*"
+rope = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
