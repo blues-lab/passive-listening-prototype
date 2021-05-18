@@ -4,9 +4,8 @@ from pathlib import Path
 import grpc
 from sclog import getLogger
 
-from plp.proto import Vad_pb2
-from plp.proto import Vad_pb2_grpc
-from vad import file_has_speech
+from plp.proto import Transcription_pb2
+from plp.proto import Transcription_pb2_grpc
 
 logger = getLogger(__name__)
 
@@ -24,17 +23,15 @@ def save_bytes_as_tmp_wav_file(b: bytes) -> str:
     return path
 
 
-class TranscriptionService(Vad_pb2_grpc.VadServiceServicer):
-    def CheckAudioForSpeech(self, request, context):
+class TranscriptionService(Transcription_pb2_grpc.TranscriptionServiceServicer):
+    def TranscribeFile(self, request, context):
         logger.debug("received request %i", request.id)
 
         tmp_file = Path(save_bytes_as_tmp_wav_file(request.audio))
-
-        result = file_has_speech(str(tmp_file))
-
+        # TODO Transcribe wave file at tmp_file here
         tmp_file.unlink()
-
-        return Vad_pb2.VadResponse(
+        
+        return Transcription_pb2.TranscriptionResponse(
             id=request.id,
-            isSpeech=result,
+            text=None, # TODO add text 
         )
