@@ -17,10 +17,9 @@ import easyocr
 from difflib import SequenceMatcher
 import json
 
-def main(filename = "recordings/v1/recording1.wav"):
+def transcribe(filename = "recordings/v1/recording1.wav"):
     words = set(nltk.corpus.words.words())
     
-    # filename = 'recordings/preamble10.wav'
     url = 'file://' + os.path.realpath(filename)
     browser = webbrowser.get('/usr/bin/google-chrome').open(url, new=1) 
     time.sleep(2) 
@@ -143,6 +142,3 @@ def compute_merged_phrases_deduped(phrases):
         j += 1
     merged_phrases.append(prev_phrase)
     return merged_phrases
-
-if __name__ == '__main__': 
-    main()

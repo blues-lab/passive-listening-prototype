@@ -6,6 +6,7 @@ from sclog import getLogger
 
 from plp.proto import Transcription_pb2
 from plp.proto import Transcription_pb2_grpc
+from audio2text import transcribe
 
 logger = getLogger(__name__)
 
@@ -29,9 +30,10 @@ class TranscriptionService(Transcription_pb2_grpc.TranscriptionServiceServicer):
 
         tmp_file = Path(save_bytes_as_tmp_wav_file(request.audio))
         # TODO Transcribe wave file at tmp_file here
+        transcription = transcribe(str(tmp_file))
         tmp_file.unlink()
         
         return Transcription_pb2.TranscriptionResponse(
             id=request.id,
-            text=None, # TODO add text 
+            text=transcription, # TODO add text 
         )
