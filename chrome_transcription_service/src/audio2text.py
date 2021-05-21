@@ -3,6 +3,7 @@ from mss import mss
 from PIL import Image
 import webbrowser
 import os
+from sys import platform
 import time
 from mutagen.wave import WAVE
 
@@ -13,9 +14,27 @@ import easyocr
 from difflib import SequenceMatcher
 
 
+def open_chrome(url: str):
+    """
+    Open Chrome on the current OS
+
+    webbrowser opening via https://stackoverflow.com/a/24353812
+    os determination via https://stackoverflow.com/a/8220141
+    """
+    if platform == "linux" or platform == "linux2":
+        chrome_path = "/usr/bin/google-chrome %s"
+    elif platform == "darwin":
+        chrome_path = "open -a /Applications/Google\ Chrome.app %s"
+    elif platform == "win32":
+        chrome_path = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s"
+
+    return webbrowser.get(chrome_path).open(url, new=1)
+
+
 def transcribe(filename="recordings/v1/recording1.wav"):
     url = "file://" + os.path.realpath(filename)
-    webbrowser.get("/usr/bin/google-chrome").open(url, new=1)
+    open_chrome(url)
+
     time.sleep(2)
     # pass
     reader = easyocr.Reader(["en"])
