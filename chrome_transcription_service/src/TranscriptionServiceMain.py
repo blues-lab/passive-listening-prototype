@@ -33,7 +33,7 @@ def main():
     args = parser.parse_args()
 
     server = get_server_for_args(
-        TranscriptionService.CLASSIFICATION_SERVICE_PORT,
+        TranscriptionService.TRANSCRIPTION_SERVICE_PORT,
         args.key,
         args.cert,
         args.root,

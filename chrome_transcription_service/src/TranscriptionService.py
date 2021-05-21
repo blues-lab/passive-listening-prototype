@@ -10,7 +10,7 @@ from audio2text import transcribe
 
 logger = getLogger(__name__)
 
-CLASSIFICATION_SERVICE_PORT = 50059
+TRANSCRIPTION_SERVICE_PORT = 50057
 
 
 def save_bytes_as_tmp_wav_file(b: bytes) -> str:
