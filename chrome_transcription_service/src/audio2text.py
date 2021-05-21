@@ -1,32 +1,24 @@
 import numpy as np
-import cv2
 from mss import mss
 from PIL import Image
 import webbrowser
 import os
 import time 
-import pytesseract
-import mutagen
 from mutagen.wave import WAVE
-import nltk
 
 from PIL import Image
 import time
 from screeninfo import get_monitors
 import easyocr
 from difflib import SequenceMatcher
-import json
 
 def transcribe(filename = "recordings/v1/recording1.wav"):
-    words = set(nltk.corpus.words.words())
-    
     url = 'file://' + os.path.realpath(filename)
-    browser = webbrowser.get('/usr/bin/google-chrome').open(url, new=1) 
+    webbrowser.get('/usr/bin/google-chrome').open(url, new=1) 
     time.sleep(2) 
     # pass
     reader = easyocr.Reader(['en'])
     
-    output = ""
     audio = WAVE(filename)
     audio_time = int(audio.info.length)
     curr_time = 0 
@@ -64,10 +56,6 @@ def transcribe(filename = "recordings/v1/recording1.wav"):
         read_buffer = read_buffer.strip()
         if read_buffer:
             res_text.append(read_buffer)
-    
-        # print(text)
-        # text = " ".join(w for w in nltk.wordpunct_tokenize(text) if w.lower() in words and (len(w.lower())>1 or w.lower()=='a'))
-        # print(text)
     
     print("data output", res_text)
     print("Computing Dedup")
