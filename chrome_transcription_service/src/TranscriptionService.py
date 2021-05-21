@@ -32,8 +32,8 @@ class TranscriptionService(Transcription_pb2_grpc.TranscriptionServiceServicer):
         # TODO Transcribe wave file at tmp_file here
         transcription = transcribe(str(tmp_file))
         tmp_file.unlink()
-        
+
         return Transcription_pb2.TranscriptionResponse(
             id=request.id,
-            text=transcription, # TODO add text 
+            text=transcription,  # TODO add text
         )

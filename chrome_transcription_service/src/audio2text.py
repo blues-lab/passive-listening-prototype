@@ -3,7 +3,7 @@ from mss import mss
 from PIL import Image
 import webbrowser
 import os
-import time 
+import time
 from mutagen.wave import WAVE
 
 from PIL import Image
@@ -12,38 +12,51 @@ from screeninfo import get_monitors
 import easyocr
 from difflib import SequenceMatcher
 
-def transcribe(filename = "recordings/v1/recording1.wav"):
-    url = 'file://' + os.path.realpath(filename)
-    webbrowser.get('/usr/bin/google-chrome').open(url, new=1) 
-    time.sleep(2) 
+
+def transcribe(filename="recordings/v1/recording1.wav"):
+    url = "file://" + os.path.realpath(filename)
+    webbrowser.get("/usr/bin/google-chrome").open(url, new=1)
+    time.sleep(2)
     # pass
-    reader = easyocr.Reader(['en'])
-    
+    reader = easyocr.Reader(["en"])
+
     audio = WAVE(filename)
     audio_time = int(audio.info.length)
-    curr_time = 0 
+    curr_time = 0
     monitor = get_monitors()[0]
     width = monitor.width
     height = monitor.height
-    bounding_box = {'top':int(height*3/4), 'left':int(width/4), 'width':int(width/2), 'height':int(height*1/4)}
+    bounding_box = {
+        "top": int(height * 3 / 4),
+        "left": int(width / 4),
+        "width": int(width / 2),
+        "height": int(height * 1 / 4),
+    }
     audio_start = time.time()
     images = []
     i = 0
-    with mss() as sct: 
+    with mss() as sct:
         while curr_time < audio_time:
             start = time.time()
             i += 1
             img = np.asarray(sct.grab(bounding_box))
             if i % 4 == 0:
-                im = Image.fromarray(img).convert('RGB')
+                im = Image.fromarray(img).convert("RGB")
                 im.save(f"screenshot{curr_time}.jpeg")
             images.append(img)
             time.sleep(1)
             end = time.time()
-            curr_time += (end - start)
-    
+            curr_time += end - start
+
     elapsed_time = time.time() - audio_start
-    print("Finished reading with samples size: ", len(images), " time elapsed", elapsed_time / 60, " ", elapsed_time % 60)
+    print(
+        "Finished reading with samples size: ",
+        len(images),
+        " time elapsed",
+        elapsed_time / 60,
+        " ",
+        elapsed_time % 60,
+    )
     res_text = []
     for image in images:
         read_res = reader.readtext(image)
@@ -51,12 +64,12 @@ def transcribe(filename = "recordings/v1/recording1.wav"):
         for item in read_res:
             data, text, prob = item
             print(data, text, prob)
-            if prob > .7:
+            if prob > 0.7:
                 read_buffer += " " + text
         read_buffer = read_buffer.strip()
         if read_buffer:
             res_text.append(read_buffer)
-    
+
     print("data output", res_text)
     print("Computing Dedup")
     # output = os.linesep.join([s for s in output.splitlines() if s])
@@ -65,6 +78,7 @@ def transcribe(filename = "recordings/v1/recording1.wav"):
     merged_phrases = compute_merged_phrases_deduped(phrases)
     print("Completed dedup phase 2 with ", merged_phrases)
     return ". ".join(merged_phrases)
+
 
 def compute_deduped_phrases(buffer):
     # buffer: list[str]
@@ -77,11 +91,13 @@ def compute_deduped_phrases(buffer):
         string1 = buffer[i - 1].strip()
         string2 = buffer[i].strip()
 
-        string1 = string1.replace(start_token, "") # Removes Live Caption phrase
-        string2 = string2.replace(start_token, "") # Removes Live Caption phrase
+        string1 = string1.replace(start_token, "")  # Removes Live Caption phrase
+        string2 = string2.replace(start_token, "")  # Removes Live Caption phrase
 
-        match = SequenceMatcher(None, string1, string2).find_longest_match(0, len(string1), 0, len(string2))
-        matched_region = string1[match.a: match.a + match.size].strip()
+        match = SequenceMatcher(None, string1, string2).find_longest_match(
+            0, len(string1), 0, len(string2)
+        )
+        matched_region = string1[match.a : match.a + match.size].strip()
 
         if prev_matched_region and prev_matched_region in matched_region:
             if len(phrases) > 1 and phrases[-1] in prev_matched_region:
@@ -94,7 +110,6 @@ def compute_deduped_phrases(buffer):
         i += 1
     phrases.append(prev_matched_region)
     return phrases
-
 
 
 def merge(s1, s2):
@@ -110,9 +125,10 @@ def merge(s1, s2):
             break
     return s1[:i] + s2, found_match
 
+
 def compute_merged_phrases_deduped(phrases):
     # phrases: list[str]
-    # Merge phrases that have common ending such as 
+    # Merge phrases that have common ending such as
     # "We ate food" + "ate food quickly" -> "We ate food quickly"
     j = 1
     merged_phrases = []
