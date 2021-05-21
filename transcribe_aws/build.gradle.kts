@@ -7,7 +7,7 @@ plugins {
     kotlin("plugin.serialization") version "1.5.0"
 }
 
-val awsSdkVersion = "2.16.63"
+val awsSdkVersion = "2.16.67"
 
 dependencies {
     implementation(project(":common"))
