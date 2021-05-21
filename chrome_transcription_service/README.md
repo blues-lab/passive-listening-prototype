@@ -15,4 +15,8 @@ poetry shell
 
 ## Running
 
-    python src/VadServiceMain.py
+    python src/TranscriptionServiceMain.py
+
+## Screen capture on macOS
+
+In recent versions of macOS (Catalina, High Sierra, etc.) there may be an issue with screen capture, where the only thing getting captured is the desktop background and not any of the open issues. This is a [known problem](https://github.com/BoboTiG/python-mss/issues/134) that has to do with the Terminal application not having "Screen Recording" permissions. To fix this, go to `System Preferences -> Security & Privacy -> Screen Recording -> Terminal` and make sure the checkbox is checked (indicating the app has permission).
