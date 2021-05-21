@@ -13,7 +13,20 @@ import TranscriptionService
 logger = getLogger(__name__)
 
 
+def download_nltk_words():
+    """
+    Download NLTK data
+
+    If it exists, re-download it
+    """
+    import nltk
+
+    nltk.download("words")
+
+
 def main():
+    download_nltk_words()
+
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument(
         "--key",
