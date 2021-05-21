@@ -13,7 +13,9 @@ This is the main repo for the passive listening prototype.
     It's currently responsible for recording, storing data, invoking sub-services, and serving the dashboard.
 - logging - a shared logging module
 - proto - [Protocol Buffers](https://developers.google.com/protocol-buffers/) used by the project and the build settings that compile them
-- transcribe - transcription service
+- transcribe - transcription service using wav2letter
+- transcribe_aws - transcription service using AWS cloud transcription
+- transcribe_chrome - transcription service using Chrome SODA
 - vad_service - standalone voice activity detection service (written in Python, talks to the rest of the project over gRPC)
 
 
