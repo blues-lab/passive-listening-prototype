@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "passive_listening_vad_service"
+version = "0.1.0"
+description = ""
+authors = []
+
+[tool.poetry.dependencies]
+python = ">=3.7.1,<4"
+sclog = "*"
+grpcio = "^1.35.0"
+protobuf = "^3.14.0"
+colorlog = "^4.7.2"
+webrtcvad = "^2.0.10"
+numpy = "^1.20.3"
+opencv-python = "^4.5.2"
+mss = "^6.1.0"
+Pillow = "^8.2.0"
+nltk = "^3.6.2"
+screeninfo = "^0.6.7"
+easyocr = "^1.3.1"
+mutagen = "^1.45.1"
+pytesseract = "^0.3.7"
+
+[tool.poetry.dev-dependencies]
+pylint = "*"
+mypy = "*"
+black = "*"
+rope = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+
+
+
