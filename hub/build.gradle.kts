@@ -5,10 +5,10 @@ plugins {
     id("plp.conventions")
     id("plp.grpc")
     id("com.squareup.sqldelight") version "1.5.0"
-    kotlin("plugin.serialization") version "1.5.0"
+    kotlin("plugin.serialization") version "1.5.10"
 }
 
-val ktorVersion = "1.5.2"
+val ktorVersion = "1.6.0"
 
 dependencies {
     implementation(project(":common"))

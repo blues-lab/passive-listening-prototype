@@ -1,7 +1,7 @@
 plugins {
     id("plp.conventions")
     id("plp.grpc")
-    kotlin("plugin.serialization") version "1.5.0"
+    kotlin("plugin.serialization") version "1.5.10"
 }
 
 dependencies {

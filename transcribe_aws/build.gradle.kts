@@ -4,7 +4,7 @@ plugins {
     application
     id("plp.conventions")
     id("plp.grpc")
-    kotlin("plugin.serialization") version "1.5.0"
+    kotlin("plugin.serialization") version "1.5.10"
 }
 
 val awsSdkVersion = "2.16.67"
