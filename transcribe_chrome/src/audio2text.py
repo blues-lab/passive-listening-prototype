@@ -1,17 +1,15 @@
+import os
+import time
+import webbrowser
+from difflib import SequenceMatcher
+from sys import platform
+
+import easyocr
 import numpy as np
 from mss import mss
-from PIL import Image
-import webbrowser
-import os
-from sys import platform
-import time
 from mutagen.wave import WAVE
-
 from PIL import Image
-import time
 from screeninfo import get_monitors
-import easyocr
-from difflib import SequenceMatcher
 
 
 def open_chrome(url: str):
