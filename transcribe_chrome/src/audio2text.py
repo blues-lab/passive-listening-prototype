@@ -1,8 +1,11 @@
+import argparse
 import os
 import time
 import webbrowser
 from difflib import SequenceMatcher
+from pathlib import Path
 from sys import platform
+from warnings import warn
 
 import easyocr
 import numpy as np
@@ -163,3 +166,27 @@ def compute_merged_phrases_deduped(phrases):
         j += 1
     merged_phrases.append(prev_phrase)
     return merged_phrases
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="transcribe given WAV file")
+    parser.add_argument("filename", help="the name of the file to transcribe")
+    args = parser.parse_args()
+
+    filename = args.filename
+
+    output_filename = filename + ".txt"
+    output_path = Path(output_filename)
+    if output_path.exists():
+        warn(f"output file {output_path} already exists")
+
+    input_file_path = Path(filename)
+    if input_file_path.suffix != ".wav":
+        raise ValueError(
+            f"transcription requires a .wav file, and {input_file_path} doesn't seem to be one"
+        )
+
+    transcription = transcribe(filename)
+    print(transcription)
+    with open(output_path, "w") as output:
+        output.write(transcription)
