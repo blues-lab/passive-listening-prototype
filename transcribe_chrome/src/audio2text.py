@@ -12,7 +12,10 @@ import numpy as np
 from mss import mss
 from mutagen.wave import WAVE
 from PIL import Image
+from sclog import getLogger
 from screeninfo import get_monitors
+
+logger = getLogger(__name__)
 
 
 def open_chrome(url: str):
@@ -29,6 +32,8 @@ def open_chrome(url: str):
     elif platform == "win32":
         chrome_path = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s"
 
+    logger.debug("opening Chrome at %s to %s", chrome_path, url)
+
     return webbrowser.get(chrome_path).open(url, new=1)
 
 
@@ -36,25 +41,38 @@ def transcribe(filename="recordings/v1/recording1.wav"):
     url = "file://" + os.path.realpath(filename)
     open_chrome(url)
 
-    time.sleep(2)
-    # pass
+    sleep_time_seconds = 2
+    logger.debug("waiting %i seconds for the browser to launch", sleep_time_seconds)
+    time.sleep(sleep_time_seconds)
+
+    logger.debug("preparing easyocr")
     reader = easyocr.Reader(["en"])
 
+    logger.debug("loading input file (%s) to get metadata", filename)
     audio = WAVE(filename)
+
     audio_time = int(audio.info.length)
-    curr_time = 0
+    logger.debug("the file to transcribe is %i seconds long", audio_time)
+
     monitor = get_monitors()[0]
     width = monitor.width
     height = monitor.height
+    logger.debug("the current monitor's dimensions are %i by %i", width, height)
+
     bounding_box = {
         "top": int(height * 3 / 4),
         "left": int(width / 4),
         "width": int(width / 2),
         "height": int(height * 1 / 4),
     }
+    logger.debug("the bounding box for screen capture is %s", str(bounding_box))
+
     audio_start = time.time()
     images = []
     i = 0
+
+    logger.debug("beginning screen capture (will continue for %i seconds)", audio_time)
+    curr_time = 0
     with mss() as sct:
         while curr_time < audio_time:
             start = time.time()
@@ -69,35 +87,36 @@ def transcribe(filename="recordings/v1/recording1.wav"):
             curr_time += end - start
 
     elapsed_time = time.time() - audio_start
-    print(
-        "Finished reading with samples size: ",
+    logger.debug(
+        "Finished screen capture. Captured %i images over %i minutes %i seconds",
         len(images),
-        " time elapsed",
         elapsed_time / 60,
-        " ",
         elapsed_time % 60,
     )
+
+    logger.debug("extracting text from screenshots")
     res_text = []
     for image in images:
         read_res = reader.readtext(image)
         read_buffer = ""
         for item in read_res:
             data, text, prob = item
-            print(data, text, prob)
+            logger.debug("%s %s %f", data, text, prob)
             if prob > 0.7:
                 read_buffer += " " + text
         read_buffer = read_buffer.strip()
         if read_buffer:
             res_text.append(read_buffer)
 
-    print("data output", res_text)
-    print("Computing Dedup")
-    # output = os.linesep.join([s for s in output.splitlines() if s])
+    logger.debug("raw text captured: %s", res_text)
+    logger.debug("Computing Dedup")
     phrases = compute_deduped_phrases(res_text)
-    print("Completed dedup phase 1 with ", phrases)
+    logger.debug("Completed dedup phase 1 with %s", phrases)
     merged_phrases = compute_merged_phrases_deduped(phrases)
-    print("Completed dedup phase 2 with ", merged_phrases)
-    return ". ".join(merged_phrases)
+    logger.debug("Completed dedup phase 2 with %s", merged_phrases)
+    result = ". ".join(merged_phrases)
+    logger.info("transcription: %s", result)
+    return result
 
 
 def compute_deduped_phrases(buffer):
