@@ -4,12 +4,16 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.ExperimentalCli
 import kotlinx.cli.Subcommand
+import kotlinx.cli.default
 import kotlinx.cli.required
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import plp.common.CONFIG_FILENAME
 import plp.common.configureLogging
 import plp.common.rpc.client.GrpcChannelChoice
+import plp.common.toPath
+import plp.hub.prerecording.splitFile
+import plp.hub.recording.Recording
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 
@@ -45,10 +49,25 @@ fun main(args: Array<String>) {
     }
 
     class PrerecordedAudio : Subcommand("file", "use audio from pre-recorded file") {
-        val fileName by argument(ArgType.String, "the filename of the pre-recorded file")
+        val fileName by argument(ArgType.String, description = "the filename of the pre-recorded file")
+        val segmentDuration by option(
+            ArgType.Int,
+            fullName = "duration",
+            shortName = "d",
+            description = "how long (in seconds) each segment should be"
+        ).default(15)
 
         override fun execute() {
-            TODO("TODO: will process $fileName")
+            val dataDirectory = dataDir.toPath()
+            val channelChoice: GrpcChannelChoice = GrpcChannelChoice.fromArgs(root = root, cert = cert, key = key)
+
+            val segments = splitFile(fileName.toPath(), dataDirectory, segmentDuration).map { Recording(it) }
+
+            val state = RecordingState
+            val recordingJob = runPipelineForRecordings(dataDirectory, channelChoice, state, segments)
+            runBlocking {
+                recordingJob.join()
+            }
 
             subcommandExecuted = true
         }

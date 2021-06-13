@@ -159,6 +159,45 @@ fun launchRecordingPipeline(dataDirectory: Path, channelChoice: GrpcChannelChoic
     return recordingJob
 }
 
+@ExperimentalCoroutinesApi
+@ExperimentalPathApi
+fun runPipelineForRecordings(
+    dataDirectory: Path,
+    channelChoice: GrpcChannelChoice,
+    state: RecordingState,
+    recordings: Iterable<Recording>
+): Job {
+    val database = initDatabase(dataDirectory)
+    state.database = database
+    val transcriber = TranscriptionClient(channelChoice)
+    val vad = VadClient(channelChoice)
+
+    val classifiers: ClassificationClientList =
+        GLOBAL_CONFIG.classificationServices.map { service -> ClassificationClient(channelChoice, service) }
+
+    logger.trace { "launching recording pipeline in a new job" }
+    val recordingJob = GlobalScope.launch {
+        logger.debug { "started the new recording pipeline job" }
+
+        var i = 0
+
+        for (newRecording in recordings) {
+            logger.trace { "received new recording $newRecording in main recording pipeline job. launching new job to handle it. " }
+
+            launchJobToHandleRecording(database, transcriber, vad, classifiers, newRecording).invokeOnCompletion {
+                logger.debug("finished processing recording $i of current session: $newRecording")
+                i++
+            }
+
+            logger.trace { "done launching coroutine for handling recording $newRecording" }
+        }
+    }
+
+    logger.trace { "done launching new recording pipeline job" }
+
+    return recordingJob
+}
+
 /**
  * Toggle recording status based on STDIN input.
  * Returns only after receiving EOF (CTRL-D).
