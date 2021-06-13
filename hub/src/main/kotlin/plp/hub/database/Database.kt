@@ -29,9 +29,24 @@ fun initDatabase(dataPath: Path): Database {
     return database
 }
 
+/**
+ * If a recording's timestamp is not available, use this value
+ */
+const val DEFAULT_TIMESTAMP_WHEN_NOT_AVAILABLE = 0
+
+/**
+ * Infer timestamp for recording's filename
+ * (Only works with recordings created with internal plp.hub.recording.Recording implementations)
+ * @see plp.hub.recording.pathToNextRecording
+ */
 @ExperimentalPathApi
 fun getTimestampFromRecording(recording: Recording): Int {
-    return recording.path.nameWithoutExtension.toInt()
+    val inferredTimestamp = recording.path.nameWithoutExtension.toIntOrNull()
+    if (inferredTimestamp == null) {
+        logger.error { "failed to infer timestamp from recording's path (will use timestamp 0): ${recording.path}" }
+        return DEFAULT_TIMESTAMP_WHEN_NOT_AVAILABLE
+    }
+    return inferredTimestamp
 }
 
 /**
