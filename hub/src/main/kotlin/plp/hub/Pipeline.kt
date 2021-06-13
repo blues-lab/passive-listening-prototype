@@ -54,7 +54,7 @@ suspend fun transcribeRecording(
         val transcriptId = database.saveTranscript(recording, text)
         TranscribedRecording(recording, text, transcriptId)
     } catch (err: io.grpc.StatusException) {
-        logger.error("transcription failed: $err")
+        logger.error("transcription of $recording failed: $err")
         recording
     }
 }
@@ -67,7 +67,7 @@ suspend fun checkRecordingForSpeech(
     return try {
         vad.recordingHasSpeech(recording)
     } catch (err: io.grpc.StatusException) {
-        logger.error("vad failed: $err")
+        logger.error("voice activity detection failed for $recording (will treat recording as having speech): $err")
         true // to be safe, if vad fails, assume it might have speech
     }
 }
@@ -88,15 +88,15 @@ fun CoroutineScope.classifyRecording(
                         val classification = classifier.classifyRecording(recording)
                         database.saveClassification(recording, classification)
                     } catch (err: io.grpc.StatusException) {
-                        logger.error("classification failed: $err")
+                        logger.error("classification of $recording failed: $err")
                     }
                 }
             }
         } else {
-            logger.debug { "recording has no usable transcription, skipping classification" }
+            logger.debug { "recording $recording has no usable transcription, skipping classification" }
         }
     } else {
-        logger.debug { "recording hasn't been transcribed, skipping classification" }
+        logger.debug { "recording $recording hasn't been transcribed, skipping classification" }
     }
 
     return recording
