@@ -69,7 +69,15 @@ fun Database.registerRecording(recording: Recording): Long {
         DEFAULT_DURATION_SECONDS.toDouble()
     ) // FIXME: use computed recording duration
 
-    return queries.lastInsertRowId().executeAsOne()
+    val lastRowId = queries.lastInsertRowId().executeAsOne()
+
+    if (lastRowId == 0L) {
+        logger.warning { "SELECT last_insert_rowid(); returned 0 when registering $recording. This may not be correct. Will search for inserted value's ID instead" }
+        return queries.getIdForFilename(filename).executeAsOneOrNull()
+            ?: throw DatabaseException("could not find just-inserted recording in the database: $recording")
+    }
+
+    return lastRowId
 }
 
 /**

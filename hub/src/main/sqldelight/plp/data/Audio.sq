@@ -10,3 +10,6 @@ INSERT INTO audio VALUES (NULL, ?, ?, ?);
 
 lastInsertRowId:
 SELECT last_insert_rowid();
+
+getIdForFilename:
+SELECT id FROM audio WHERE filename = ? ORDER BY id DESC LIMIT 1;
