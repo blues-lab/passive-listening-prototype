@@ -111,7 +111,10 @@ fun CoroutineScope.launchJobToHandleRecording(
     newRecording: Recording
 ) = launch {
     logger.trace { "inside the new coroutine job to handle pipeline for recording $newRecording" }
+
     var recording = registerRecording(database, newRecording)
+    logger.debug { "registered $newRecording as $recording " }
+
     if (checkRecordingForSpeech(vad, recording)) {
         recording = transcribeRecording(database, transcriber, recording)
         classifyRecording(database, classifiers, recording)
