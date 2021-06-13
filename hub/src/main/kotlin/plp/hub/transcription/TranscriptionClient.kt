@@ -35,7 +35,7 @@ open class TranscriptionClient(grpcChannelChoice: GrpcChannelChoice) :
         val transcriptionRequest =
             Transcription.TranscriptionRequest.newBuilder().setAudio(fileContents).setId(fileId).build()
         val response = stub.transcribeFile(transcriptionRequest)
-        logger.debug { "received transcription response $response" }
+        logger.debug { "received transcription response for $file: $response" }
         return response.text
     }
 }
