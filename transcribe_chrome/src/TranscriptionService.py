@@ -25,12 +25,18 @@ def save_bytes_as_tmp_wav_file(b: bytes) -> str:
 
 
 class TranscriptionService(Transcription_pb2_grpc.TranscriptionServiceServicer):
+    def __init__(self, screenshot_dir: Path) -> None:
+        super().__init__()
+        self.screenshot_dir = screenshot_dir
+
     def TranscribeFile(self, request, context):
         logger.debug("received request %i", request.id)
 
         tmp_file = Path(save_bytes_as_tmp_wav_file(request.audio))
         # TODO Transcribe wave file at tmp_file here
-        transcription = transcribe(str(tmp_file))
+        transcription = transcribe(
+            str(tmp_file), screenshot_directory=self.screenshot_dir
+        )
         tmp_file.unlink()
 
         return Transcription_pb2.TranscriptionResponse(

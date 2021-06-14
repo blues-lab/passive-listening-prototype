@@ -1,6 +1,8 @@
 import argparse
 import os
+import tempfile
 import time
+import typing
 import webbrowser
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -37,7 +39,10 @@ def open_chrome(url: str):
     return webbrowser.get(chrome_path).open(url, new=1)
 
 
-def transcribe(filename="recordings/v1/recording1.wav"):
+def transcribe(
+    filename="recordings/v1/recording1.wav",
+    screenshot_directory: Path = Path(),
+):
     url = "file://" + os.path.realpath(filename)
     open_chrome(url)
 
@@ -80,7 +85,11 @@ def transcribe(filename="recordings/v1/recording1.wav"):
             img = np.asarray(sct.grab(bounding_box))
             if i % 4 == 0:
                 im = Image.fromarray(img).convert("RGB")
-                im.save(f"screenshot{curr_time}.jpeg")
+
+                screenshot_filename = f"screenshot{curr_time}.jpeg"
+                screenshot_path = screenshot_directory / screenshot_filename
+                im.save(screenshot_path)
+
             images.append(img)
             time.sleep(1)
             end = time.time()
@@ -190,6 +199,9 @@ def compute_merged_phrases_deduped(phrases):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="transcribe given WAV file")
     parser.add_argument("filename", help="the name of the file to transcribe")
+    parser.add_argument(
+        "--screenshot-dir", required=False, help="directory to store screenshot files"
+    )
     args = parser.parse_args()
 
     filename = args.filename
@@ -205,7 +217,14 @@ if __name__ == "__main__":
             f"transcription requires a .wav file, and {input_file_path} doesn't seem to be one"
         )
 
-    transcription = transcribe(filename)
+    screenshot_dir = args.screenshot_dir
+    if screenshot_dir is None:
+        screenshot_dir = Path(tempfile.mkdtemp())
+    else:
+        screenshot_dir = Path(args.screenshot_dir)
+    logger.debug("will save screenshots to %s", screenshot_dir)
+
+    transcription = transcribe(filename, screenshot_dir)
     print(transcription)
     with open(output_path, "w") as output:
         output.write(transcription)
