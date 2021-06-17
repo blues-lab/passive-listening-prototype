@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package plp.proto;
+
+service PermissionPollService {
+  rpc PermissionPoll (PermissionPollRequest) returns (PermissionPollResponse) {}
+}
+
+message PermissionPollRequest {
+  /** id for request type */
+  string type = 1;
+}
+
+message PermissionPollResponse {
+  /** template for question */
+  string template = 1;
+  /** specific info */
+  string slot = 2;
+  /** url to find specified info */
+  string url = 3;
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package plp.proto;
+
+service PermissionDisplayService {
+  rpc PermissionDisplay (PermissionDisplayRequest) returns (PermissionDisplayResponse) {}
+}
+
+message PermissionDisplayRequest {
+  /** id for request type */
+  string type = 1;
+}
+
+message PermissionDisplayResponse {
+  /** info to display  */
+  string text = 1;
+}
