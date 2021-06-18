@@ -7,8 +7,8 @@ service PermissionDisplayService {
 }
 
 message PermissionDisplayRequest {
-  /** id for request type */
-  string type = 1;
+  /** content to send to classifier */
+  string content = 1;
 }
 
 message PermissionDisplayResponse {

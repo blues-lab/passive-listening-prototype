@@ -7,8 +7,8 @@ service PermissionPollService {
 }
 
 message PermissionPollRequest {
-  /** id for request type */
-  string type = 1;
+  /** content to class */
+  string content = 1;
 }
 
 message PermissionPollResponse {
