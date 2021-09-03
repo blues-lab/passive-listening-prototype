@@ -9,7 +9,9 @@ import plp.common.GLOBAL_CONFIG
 import plp.common.Transcriber
 import plp.common.configureLogging
 import plp.common.resolveHomeDirectory
+import plp.common.rpc.client.GrpcChannelChoice
 import plp.common.rpc.server.GrpcServer
+import plp.hub.vad.ChromeTranscriber
 import plp.logging.KotlinLogging
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
@@ -22,6 +24,10 @@ fun main(args: Array<String>) {
     val model by parser.option(
         ArgType.String,
         description = "the directory containing the wav2letter model. If omitted, server will respond with fake transcriptions instead of actually invoking the transcription process"
+    )
+    val chrome by parser.option(
+        ArgType.Boolean,
+        description = "whether to enable chrome transcription"
     )
     val tmpDir by parser.option(ArgType.String, description = "path for temporarily storing files being transcribed").required()
     val root by parser.option(ArgType.String, description = "path to root certificate chain, if using mutual TLS")
@@ -43,8 +49,13 @@ fun main(args: Array<String>) {
     logger.info("starting Transcription server")
 
     val transcriber: Transcriber = if (model == null) {
-        logger.error("missing argument: `model` (wav2letter model path). Server will respond with fake transcriptions instead of actually invoking the transcription process")
-        FakeTranscriber()
+        if(chrome == null) {
+            logger.error("missing argument: `model` (wav2letter model path). Server will respond with fake transcriptions instead of actually invoking the transcription process")
+            FakeTranscriber()
+        } else {
+            val channelChoice: GrpcChannelChoice = GrpcChannelChoice.fromArgs(root = root, cert = cert, key = key)
+            ChromeTranscriber(channelChoice)
+        }
     } else {
         Wav2letterTranscriber(
             Path(resolveHomeDirectory(model!!)),
