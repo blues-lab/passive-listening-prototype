@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+service DashboardService {
+  rpc getDashboardData (DashboardRequest) returns (DashboardResponse) {}
+}
+
+message DashboardRequest {
+  int32 id = 1;
+  int32 classificationLimit = 15;
+  DashboardRequeststring dashboardResultType = 5;
+}
+
+message DashboardResponse {
+    int32 status = 200;
+    string classificationName = 5;
+    repeated string text = 10;
+}

@@ -28,13 +28,14 @@ fun Route.clearTemplateCache() {
         call.respondText("Template cache cleared", ContentType.Text.Plain)
     }
 }
+var dashboardData = mutableMapOf<String, String>()
 
 fun Route.showDashboard() {
     get("/") {
         call.respond(
             MustacheContent(
                 "index.html",
-                emptyMap<String, Unit>()
+                dashboardData
             )
         )
     }

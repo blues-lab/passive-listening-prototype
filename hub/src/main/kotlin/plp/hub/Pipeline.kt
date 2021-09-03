@@ -24,6 +24,8 @@ import plp.hub.transcription.TranscribedRecording
 import plp.hub.transcription.Transcriber
 import plp.hub.transcription.TranscriptionClient
 import plp.hub.vad.VadClient
+import plp.hub.web.DashboardClient
+import plp.hub.web.DashboardClientList
 import plp.hub.web.WEB_SERVICE_SHUTDOWN_TIMEOUT_MS
 import plp.hub.web.startWebserver
 import plp.logging.KotlinLogging
@@ -174,6 +176,8 @@ fun runPipelineForRecordings(
 
     val classifiers: ClassificationClientList =
         GLOBAL_CONFIG.classificationServices.map { service -> ClassificationClient(channelChoice, service) }
+
+    val dashboardListeners: DashboardClientList = GLOBAL_CONFIG.classificationServices.map { service -> DashboardClient(channelChoice, service) }
 
     logger.trace { "launching recording pipeline in a new job" }
     val recordingJob = GlobalScope.launch {
