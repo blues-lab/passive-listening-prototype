@@ -16,35 +16,31 @@ from mutagen.wave import WAVE
 from PIL import Image
 from sclog import getLogger
 from screeninfo import get_monitors
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 logger = getLogger(__name__)
-
+# TODO possibly set to tmp or same directory as wavs are stored
+transcription_cache_dir = "transcriptionCache" 
 
 def open_chrome(url: str):
     """
-    Open Chrome on the current OS
-
-    webbrowser opening via https://stackoverflow.com/a/24353812
-    os determination via https://stackoverflow.com/a/8220141
+    Opens a full screen 
     """
-    if platform == "linux" or platform == "linux2":
-        chrome_path = "/usr/bin/google-chrome %s"
-    elif platform == "darwin":
-        chrome_path = "open -a /Applications/Google\ Chrome.app %s"
-    elif platform == "win32":
-        chrome_path = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s"
-
-    logger.debug("opening Chrome at %s to %s", chrome_path, url)
-
-    return webbrowser.get(chrome_path).open(url, new=1)
-
+    options = Options()
+    options.add_argument(f"user-data-dir={os.getcwd()}/{transcription_cache_dir}")
+    options.add_argument("window-size=1920,1280")
+    options.add_argument('log-level=3')
+    driver = webdriver.Chrome(options=options)
+    driver.get(url)
+    return driver
 
 def transcribe(
     filename="recordings/v1/recording1.wav",
     screenshot_directory: Path = Path(),
 ):
     url = "file://" + os.path.realpath(filename)
-    open_chrome(url)
+    driver = open_chrome(url)
 
     sleep_time_seconds = 2
     logger.debug("waiting %i seconds for the browser to launch", sleep_time_seconds)
@@ -119,12 +115,19 @@ def transcribe(
 
     logger.debug("raw text captured: %s", res_text)
     logger.debug("Computing Dedup")
+    if len(res_text) == 1:
+        transcription = res_text[0].replace("Live Caption", "")
+        logger.info("Transcription %s", transcription)
+        return transcription
+    
     phrases = compute_deduped_phrases(res_text)
     logger.debug("Completed dedup phase 1 with %s", phrases)
     merged_phrases = compute_merged_phrases_deduped(phrases)
     logger.debug("Completed dedup phase 2 with %s", merged_phrases)
     result = ". ".join(merged_phrases)
     logger.info("transcription: %s", result)
+
+    driver.close()
     return result
 
 
