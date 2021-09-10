@@ -249,7 +249,7 @@ fun runRecordingHub(dataDirectory: Path, channelChoice: GrpcChannelChoice) = run
     state.audioFileDirectory = dataDirectory
     val recordingJob = launchRecordingPipeline(dataDirectory, channelChoice, state)
 
-    val server = startWebserver()
+    val server = startWebserver(channelChoice)
 
     // Control state based on user input
     blockForUserRecordingControl(state)

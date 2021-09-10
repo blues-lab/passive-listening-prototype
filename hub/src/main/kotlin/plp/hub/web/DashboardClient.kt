@@ -2,9 +2,10 @@ package plp.hub.web
 
 import plp.common.Service
 import plp.common.rpc.client.GrpcChannelChoice
-import plp.hub.classify.ClassificationClient
-import plp.hub.transcription.TranscribedRecording
 import plp.logging.KotlinLogging
+import plp.proto.Dashboard
+import plp.proto.DashboardServiceGrpcKt
+
 private val logger = KotlinLogging.logger {}
 
 class DashboardClient(grpcChannelChoice: GrpcChannelChoice, service: Service) {
@@ -16,16 +17,17 @@ class DashboardClient(grpcChannelChoice: GrpcChannelChoice, service: Service) {
             )
         )
 
-    suspend fun queryDashboardData(): Dashboard.DashboardResponse {
+    suspend fun queryDashboardData(): Map<String, String> {
         val request = Dashboard.DashboardRequest.newBuilder()
             .setClassificationLimit(1)
             .setDashboardResultType("raw").build()
         val response = stub.getDashboardData(request)
-        response.textList
 
         logger.debug { "recieved $response" }
-        dashboardData[response.classificationName] = response.textList.joinToString(separator = "\n")
-        return response
+        val dashboardData = emptyMap<String, String>().toMutableMap()
+        dashboardData["name"] = response.classificationName
+        dashboardData["display_details"] = response.textList.joinToString(separator = "\n")
+        return dashboardData
     }
 }
 

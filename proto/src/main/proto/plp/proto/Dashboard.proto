@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package plp.proto;
+
 service DashboardService {
   rpc getDashboardData (DashboardRequest) returns (DashboardResponse) {}
 }
@@ -7,7 +9,7 @@ service DashboardService {
 message DashboardRequest {
   int32 id = 1;
   int32 classificationLimit = 15;
-  DashboardRequeststring dashboardResultType = 5;
+  string dashboardResultType = 5;
 }
 
 message DashboardResponse {

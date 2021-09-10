@@ -11,6 +11,8 @@ import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
+import plp.common.GLOBAL_CONFIG
+import plp.common.rpc.client.GrpcChannelChoice
 import plp.hub.RecordingState
 import plp.hub.RecordingStatus
 import plp.hub.database.selectAfterTimestamp
@@ -28,14 +30,44 @@ fun Route.clearTemplateCache() {
         call.respondText("Template cache cleared", ContentType.Text.Plain)
     }
 }
-var dashboardData = mutableMapOf<String, String>()
 
 fun Route.showDashboard() {
     get("/") {
         call.respond(
             MustacheContent(
                 "index.html",
-                dashboardData
+                emptyMap<String, String>()
+            )
+        )
+    }
+}
+
+fun Route.showDisplay() {
+    get("/display") {
+        call.respond(
+            MustacheContent(
+                "display.html",
+                emptyMap<String, String>()
+            )
+        )
+    }
+}
+
+fun Route.loadDashboardData(channelChoice: GrpcChannelChoice) {
+    get("/api/load_dashboard_data") {
+        val dashboardQueries: DashboardClientList =
+            GLOBAL_CONFIG.classificationServices.map {
+                service ->
+                DashboardClient(channelChoice, service)
+            }
+        val result = dashboardQueries.map {
+            dashboard_request ->
+            dashboard_request.queryDashboardData()
+        }
+        call.respond(
+            MustacheContent(
+                "display_details.html",
+                mapOf("dashboardData" to result)
             )
         )
     }
