@@ -49,7 +49,7 @@ fun main(args: Array<String>) {
     logger.info("starting Transcription server")
 
     val transcriber: Transcriber = if (model == null) {
-        if(chrome == null) {
+        if (chrome == null) {
             logger.error("missing argument: `model` (wav2letter model path). Server will respond with fake transcriptions instead of actually invoking the transcription process")
             FakeTranscriber()
         } else {

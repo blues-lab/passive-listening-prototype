@@ -33,7 +33,7 @@ import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 
 /** How long each recording should be, by default */
-const val DEFAULT_DURATION_SECONDS = 5
+const val DEFAULT_DURATION_SECONDS = 10
 
 private val logger = KotlinLogging.logger { }
 
