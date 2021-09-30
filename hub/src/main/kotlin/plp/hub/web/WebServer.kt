@@ -16,7 +16,6 @@ import io.ktor.serialization.json
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import plp.common.rpc.client.GrpcChannelChoice
 import plp.logging.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -51,7 +50,7 @@ val DASHBOARD_PATH: Path = Path(
 var serverTemplateEngine: InvalidatableMustacheFactory? = null
 
 @ExperimentalPathApi
-fun Application.module(grpcChannelChoice: GrpcChannelChoice) {
+fun Application.module() {
     install(DefaultHeaders)
     install(CallLogging)
 
@@ -79,7 +78,7 @@ fun Application.module(grpcChannelChoice: GrpcChannelChoice) {
             renderRecordings()
 
             showDisplay()
-            loadDashboardData(grpcChannelChoice)
+            loadDashboardData()
 
             showRecordingControlButton()
 
@@ -95,7 +94,7 @@ fun Application.module(grpcChannelChoice: GrpcChannelChoice) {
 }
 
 @ExperimentalPathApi
-fun startWebserver(grpcChannelChoice: GrpcChannelChoice): ApplicationEngine {
+fun startWebserver(): ApplicationEngine {
     logger.debug { "starting web server" }
     val server =
         embeddedServer(
@@ -103,7 +102,7 @@ fun startWebserver(grpcChannelChoice: GrpcChannelChoice): ApplicationEngine {
             WEB_SERVICE_PORT
             // watchPaths = listOf("web"), // disabled because it doesn't seem to pick up on the current file's path. Instead all changes should be picked up, which is fine.
         ) {
-            module(grpcChannelChoice)
+            module()
         }
     server.start()
     logger.debug { "started web server" }

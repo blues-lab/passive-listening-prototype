@@ -21,9 +21,13 @@ class DashboardClient(grpcChannelChoice: GrpcChannelChoice, service: Service) {
         val request = Dashboard.DashboardRequest.newBuilder()
             .setClassificationLimit(1)
             .setDashboardResultType("raw").build()
-        val response = stub.getDashboardData(request)
-
-        logger.debug { "recieved $response" }
+        var response: Dashboard.DashboardResponse = Dashboard.DashboardResponse.newBuilder().build();
+        try {
+            response = stub.getDashboardData(request)
+            logger.debug { "recieved $response" }
+        }  catch(e: io.grpc.StatusException) {
+            println("Exception in get dashboard data $e $response")
+        }
         val dashboardData = emptyMap<String, String>().toMutableMap()
         dashboardData["name"] = response.classificationName
         dashboardData["display_details"] = response.textList.joinToString(separator = "\n")

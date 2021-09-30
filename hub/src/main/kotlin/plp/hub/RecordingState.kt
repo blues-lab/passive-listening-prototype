@@ -1,6 +1,7 @@
 package plp.hub
 
 import plp.data.Database
+import plp.hub.web.DashboardClientList
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 
@@ -18,4 +19,8 @@ object RecordingState {
 
     @ExperimentalPathApi
     var audioFileDirectory = Path("/tmp")
+}
+
+object DashboardSate {
+    var dashboardListeners: DashboardClientList? = null
 }

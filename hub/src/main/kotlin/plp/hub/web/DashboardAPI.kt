@@ -11,8 +11,9 @@ import io.ktor.response.respondText
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
-import plp.common.GLOBAL_CONFIG
-import plp.common.rpc.client.GrpcChannelChoice
+import plp.hub.DashboardSate
+// import plp.common.GLOBAL_CONFIG
+// import plp.common.rpc.client.GrpcChannelChoice
 import plp.hub.RecordingState
 import plp.hub.RecordingStatus
 import plp.hub.database.selectAfterTimestamp
@@ -53,17 +54,15 @@ fun Route.showDisplay() {
     }
 }
 
-fun Route.loadDashboardData(channelChoice: GrpcChannelChoice) {
-    get("/api/load_dashboard_data") {
-        val dashboardQueries: DashboardClientList =
-            GLOBAL_CONFIG.classificationServices.map {
-                service ->
-                DashboardClient(channelChoice, service)
-            }
-        val result = dashboardQueries.map {
-            dashboard_request ->
-            dashboard_request.queryDashboardData()
+@ExperimentalPathApi
+fun Route.loadDashboardData() {
+    get("/load_dashboard_data") {
+        val result = DashboardSate.dashboardListeners?.map { dashboard_request ->
+                dashboard_request.queryDashboardData()
         }
+
+//        var result = null;
+        println(result)
         call.respond(
             MustacheContent(
                 "display_details.html",
