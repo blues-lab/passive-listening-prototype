@@ -2,6 +2,7 @@ Passive Listening Prototype
 ===========================
 
 This is the main repo for the passive listening prototype.
+The applications designed for this prototype can be found in [a separate repo](https://github.com/blues-lab/passive-listening-classifiers).
 
 ## Structure
 
